@@ -32,7 +32,7 @@ public class Gui {
     public static ActionBar actionBarConfigurations(ActionBar _actBar) {
         ActionBar actBar = _actBar;
 
-        if (actBar != null) {
+        if(actBar != null) {
             //Desactivate clickable title (arrow):
             actBar.setDisplayHomeAsUpEnabled(false);
             //Force displaying app title:
@@ -50,11 +50,11 @@ public class Gui {
         ActionBar actBar = _actBar;
         int index = 0;
 
-        if (actBar != null) {
+        if(actBar != null) {
             //Log.d("Ayoub0", names.size() + "-" + fragments.size());
             //We need to have same number of tabs and fragments to succeed in attaching listener to each tab:
-            if (names.size() == fragments.size()) {
-                for (String name : names) {
+            if(names.size() == fragments.size()) {
+                for(String name : names) {
                     //Log.d("AyoubFragments:", fragments.get(index).toString()+"//"+index);
                     ActionBar.Tab tab = actBar.newTab().setText(name);
                     tab.setTabListener(new TabItemListener(fragments.get(index)));

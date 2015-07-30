@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
 
+import dk.aau.mppss.friendfinder.MainActivity;
 import dk.aau.mppss.friendfinder.R;
 import dk.aau.mppss.friendfinder.controller.maps.MapsController;
 
@@ -54,17 +55,18 @@ public class MapsFragment extends Fragment {
         }
         */
         //Controller Initialization:
-        if (this.mapsController == null) {
+        if(this.mapsController == null) {
             this.mapsController = new MapsController(this.mapView, inflater);
-        } else {
-            //Each onCreateView updates MapView so we must update
-            //our MapView for Model-Controler-View interactions):
-            this.mapsController.updateMapView(mapView);
-            //same for inflater:
-            this.mapsController.updateWindowAdapter(inflater);
+        }
+        //Each onCreateView updates MapView so we must update
+        //our MapView for Model-Controler-View interactions):
+        this.mapsController.updateMapView(mapView);
+        //same for inflater:
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if(mainActivity != null) {
+            this.mapsController.enableWindowAdapter(mainActivity, inflater);
         }
         //Log.e("AYOUB", "onCreateView ");
-
         return parentView;
     }
 
@@ -72,10 +74,10 @@ public class MapsFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (this.mapsController != null) {
+        if(this.mapsController != null) {
             this.mapsController.initializeMaps();
             //Restore Camera state from our saved bundle:
-            if (savedInstanceState != null) {
+            if(savedInstanceState != null) {
                 double latitude = savedInstanceState.getDouble("latitude");
                 double longitude = savedInstanceState.getDouble("longitude");
                 float zoom = savedInstanceState.getFloat("zoom");
@@ -86,7 +88,7 @@ public class MapsFragment extends Fragment {
                 this.mapsController.moveAnimatedCamera(58.0, 9.0, 4);
             }
             //Redraw Markers if there is an orientation modification or something else:
-            if (this.poiList != null) {
+            if(this.poiList != null) {
                 this.mapsController.updateMapMarkers(this.poiList);
             }
         }
@@ -104,7 +106,7 @@ public class MapsFragment extends Fragment {
         super.onResume();
         this.mapView.onResume();
 
-        if (this.mapsController != null) {
+        if(this.mapsController != null) {
             this.mapsController.addPOIListener();
             this.mapsController.removePOIListener();
             //We update POI list in order to backup our Marker View via class variable and setRetainInstance:

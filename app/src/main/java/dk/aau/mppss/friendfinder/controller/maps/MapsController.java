@@ -9,24 +9,30 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
 
+import dk.aau.mppss.friendfinder.MainActivity;
 import dk.aau.mppss.friendfinder.model.maps.CameraModel;
 import dk.aau.mppss.friendfinder.model.maps.MapsModel;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
+import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
 /**
  * Created by adibayoub on 28/07/2015.
  */
 public class MapsController {
     private MapsModel maps;
+    private MainActivity mainActivity;
 
     public MapsController(MapView mapView, LayoutInflater inflater) {
         this.maps = new MapsModel(mapView);
-        //Set up WindowAdapter for our marker maps: (i.e. popup box when clicking on a marker):
-        this.maps.getGoogleMap().setInfoWindowAdapter(new MapsWindowAdapter(inflater, true));
     }
 
-    public void updateWindowAdapter(LayoutInflater inflater) {
-        this.maps.getGoogleMap().setInfoWindowAdapter(new MapsWindowAdapter(inflater, true));
+    public void enableWindowAdapter(MainActivity mainActivity, LayoutInflater inflater) {
+        if(this.mainActivity == null)
+            this.mainActivity = mainActivity;
+        //Set up WindowAdapter for our marker maps: (i.e. popup box when clicking on a marker):
+        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(mainActivity, inflater, true);
+        this.maps.getGoogleMap().setInfoWindowAdapter(mapsWindowAdapter);
+        this.maps.getGoogleMap().setOnInfoWindowClickListener(mapsWindowAdapter);
     }
 
     public void updateMapView(MapView mapView) {
@@ -55,6 +61,9 @@ public class MapsController {
                     @Override
                     public void onMapClick(LatLng latLng) {
                         //Log.e("Ayoub log: ", "Maps clicked! "+latLng.latitude+"-"+latLng.longitude);
+                        if(mainActivity != null)
+                            mainActivity.replaceFragment(new EditMarkerFragment());
+
                         maps.addMarker(new MarkerModel("test POI", latLng.latitude, latLng.longitude));
                     }
                 }
@@ -75,7 +84,7 @@ public class MapsController {
                     @Override
                     public void onMarkerDragStart(Marker marker) {
                         //We simulate a long click on marker with dragger:
-                        if (marker != null) {
+                        if(marker != null) {
                             //Log.d("Before: ", maps.getMarkersList().toString());
                             //maps.removeMarkerFromList(marker.getPosition().latitude, marker.getPosition().longitude);
                             getMapsModel().removeMarker(marker);
@@ -104,7 +113,7 @@ public class MapsController {
                 new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                        if (marker != null) {
+                        if(marker != null) {
                             //Log.d("Before: ", maps.getMarkersList().toString());
                             //maps.removeMarkerFromList(marker.getPosition().latitude, marker.getPosition().longitude);
                             //marker.remove();
@@ -128,8 +137,8 @@ public class MapsController {
     }
 
     public boolean updateMapMarkers(List<Marker> poiMarkers) {
-        if (poiMarkers != null) {
-            for (Marker poiMarker : poiMarkers) {
+        if(poiMarkers != null) {
+            for(Marker poiMarker : poiMarkers) {
                 //Not .addMarker because we do not need to update list with new marker:
                 this.getMapsModel()
                         .addMapMarker(
@@ -159,5 +168,21 @@ public class MapsController {
 
     public MapsModel getMapsModel() {
         return maps;
+    }
+
+    public MapsModel getMaps() {
+        return maps;
+    }
+
+    public void setMaps(MapsModel maps) {
+        this.maps = maps;
+    }
+
+    public MainActivity getMainActivity() {
+        return mainActivity;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 }

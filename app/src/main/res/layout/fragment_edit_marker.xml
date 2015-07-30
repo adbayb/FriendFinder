@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/fragment_edit_marker"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fragment_edit_marker_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="POI Editor"
+            android:textSize="40sp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/fragment_edit_marker_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"/>
+
+        <EditText
+            android:id="@+id/fragment_edit_marker_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description"/>
+
+        <TextView
+            android:id="@+id/fragment_edit_marker_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableBottom="@mipmap/ic_launcher"
+            android:gravity="center"
+            android:text="Image"/>
+        <!--
+        <ImageView
+            android:id="@+id/fragment_edit_marker_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:
+            android:src="@mipmap/ic_launcher"/>
+        -->
+        <Button
+            android:id="@+id/fragment_edit_marker_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save"/>
+    </LinearLayout>
+</FrameLayout>

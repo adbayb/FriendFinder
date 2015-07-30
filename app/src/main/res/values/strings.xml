@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">FriendFinder</string>
-    <string name="button_search_friend">Search a friend</string>
-    <string name="button_locate_me">Locate me</string>
+    <string name="button_search_friend">Search a Friend</string>
+    <string name="button_search_poi">Search a POI</string>
 </resources>

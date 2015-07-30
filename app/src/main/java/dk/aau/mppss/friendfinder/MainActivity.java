@@ -26,7 +26,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         //ActionBar SetUp:
-        if (savedInstanceState != null) {
+        if(savedInstanceState != null) {
             this.mapsFragment = (MapsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "MapsFragment_State");
         } else {
             this.mapsFragment = new MapsFragment();
@@ -41,6 +41,25 @@ public class MainActivity extends ActionBarActivity {
                 new ArrayList<Fragment>(Arrays.asList(mapsFragment, poiFragment)),
                 actionBar
         );
+    }
+
+    //Allows to replace a fragment with another:
+    public void replaceFragment(Fragment fragment) {
+        //We check if activity is finished to avoid
+        //java.lang.IllegalStateException: Activity has been destroyed exception:
+        if(isFinishing() == false) {
+            //.commitAllowingStateLoss(); allows to commit after the previous fragment saved its Instance
+            //.commit(); doesn't ensure it and we can get exception with it:
+            this.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commitAllowingStateLoss();
+        }
+    }
+
+    //Allowing to return to previous displayed Fragment after switching:
+    public void previousFragment() {
+        this.getSupportFragmentManager().popBackStack();
     }
 
     @Override

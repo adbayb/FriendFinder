@@ -8,20 +8,24 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
+import dk.aau.mppss.friendfinder.MainActivity;
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
 /**
  * Created by adibayoub on 29/07/2015.
  */
 
 //Class that extends
-public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter {
+public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap.OnInfoWindowClickListener {
     //Inflater permettant de rattacher notre fênetre Popup à la vue:
     private LayoutInflater inflater;
     private boolean isShortOverview;
+    private MainActivity mainActivity;
 
     //Add MarkerModel to get information on marker (MarkerPOIModel and MarkerUserModel must extends MarkerModel!):
-    public MapsWindowAdapter(LayoutInflater inflater, boolean isShortOverview) {
+    public MapsWindowAdapter(MainActivity mainActivity, LayoutInflater inflater, boolean isShortOverview) {
+        this.mainActivity = mainActivity;
         this.inflater = inflater;
         this.isShortOverview = isShortOverview;
     }
@@ -39,7 +43,7 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter {
     public View getInfoContents(Marker marker) {
         View windowView = this.inflater.inflate(R.layout.window_adapter, null);
 
-        if (this.isShortOverview == true) {
+        if(this.isShortOverview == true) {
             this.setShortOverview(windowView, marker);
         } else {
             //TODO for Long card overview?
@@ -48,7 +52,17 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter {
         return windowView;
     }
 
-    public void setShortOverview(View view, Marker marker) {
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        if(this.mainActivity != null) {
+            this.mainActivity.replaceFragment(EditMarkerFragment.EditMarkerFragmentInstance("POI Static String. Todo: Get it From Marker!"));
+        }
+
+        //Log.e("AYOUB onInfoWinClick",""+this.mainActivity);
+        return;
+    }
+
+    private void setShortOverview(View view, Marker marker) {
         TextView title = (TextView) view.findViewById(R.id.window_adapter_title);
         TextView description = (TextView) view.findViewById(R.id.window_adapter_description);
         ImageView icon = (ImageView) view.findViewById(R.id.window_adapter_icon);
