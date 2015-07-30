@@ -23,7 +23,7 @@ public class Gui {
         /*
         this.actionBar = Gui.actionBarConfigurations(actionBar);
 
-        this.actionBar = Gui.addTabs(new ArrayList<String>(Arrays.asList("Maps View","POI List")),
+        this.actionBar = Gui.addTabs(new ArrayList<String>(Arrays.asList("MapsModel View","POI List")),
                                         new ArrayList<Fragment>(Arrays.asList(new MapsFragment(),new POIFragment())),
                                         this.actionBar);
         */

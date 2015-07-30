@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    android:id="@+id/fragment_maps"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!--
+        tools:context allows to attach a layout component to an activity (a layout must be always attached to one activity).
+        A fragment is diffucult to manager on a Fragment class with google maps Api, we used instead a map view.
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/map"
@@ -17,6 +24,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             tools:context=".MainActivity" />
+        -->
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/fragment_maps_mapView"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,20 +39,20 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/buttonSearchFriend"
+                android:id="@+id/fragment_maps_button_friend"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/button_search_friend" />
+                android:text="@string/button_search_friend"/>
 
             <Button
-                android:id="@+id/buttonLocateMe"
+                android:id="@+id/fragment_maps_button_location"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/button_locate_me" />
+                android:text="@string/button_locate_me"/>
         </LinearLayout>
     </LinearLayout>
 
 
-</LinearLayout>
+</FrameLayout>
