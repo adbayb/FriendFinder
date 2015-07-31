@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
-import dk.aau.mppss.friendfinder.MainActivity;
+import dk.aau.mppss.friendfinder.MapsActivity;
 import dk.aau.mppss.friendfinder.R;
 import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
@@ -21,11 +21,12 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
     //Inflater permettant de rattacher notre fênetre Popup à la vue:
     private LayoutInflater inflater;
     private boolean isShortOverview;
-    private MainActivity mainActivity;
+    private MapsActivity mapsActivity;
 
     //Add MarkerModel to get information on marker (MarkerPOIModel and MarkerUserModel must extends MarkerModel!):
-    public MapsWindowAdapter(MainActivity mainActivity, LayoutInflater inflater, boolean isShortOverview) {
-        this.mainActivity = mainActivity;
+    public MapsWindowAdapter(MapsActivity mapsActivity, LayoutInflater inflater, boolean isShortOverview) {
+        if(this.mapsActivity == null)
+            this.mapsActivity = mapsActivity;
         this.inflater = inflater;
         this.isShortOverview = isShortOverview;
     }
@@ -54,11 +55,14 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if(this.mainActivity != null) {
-            this.mainActivity.replaceFragment(EditMarkerFragment.EditMarkerFragmentInstance("POI Static String. Todo: Get it From Marker!"));
+        if(this.mapsActivity != null) {
+            this.mapsActivity.replaceFragment(
+                    EditMarkerFragment.EditMarkerFragmentInstance(
+                            "POI Static String. Todo: Get it From Marker!"
+                    )
+            );
         }
-
-        //Log.e("AYOUB onInfoWinClick",""+this.mainActivity);
+        //Log.e("AYOUB onInfoWinClick",""+this.mapsActivity);
         return;
     }
 

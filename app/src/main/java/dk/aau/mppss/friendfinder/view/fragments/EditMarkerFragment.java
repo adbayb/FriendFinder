@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import dk.aau.mppss.friendfinder.MainActivity;
+import dk.aau.mppss.friendfinder.MapsActivity;
 import dk.aau.mppss.friendfinder.R;
 
 /**
@@ -61,9 +61,9 @@ public class EditMarkerFragment extends Fragment {
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            MainActivity mainActivity = (MainActivity) getActivity();
-                            if(mainActivity != null) {
-                                mainActivity.previousFragment();
+                            MapsActivity mapsActivity = (MapsActivity) getActivity();
+                            if(mapsActivity != null) {
+                                mapsActivity.previousFragment();
                             }
                         }
                     }

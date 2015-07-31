@@ -1,77 +1,90 @@
 package dk.aau.mppss.friendfinder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 
-import dk.aau.mppss.friendfinder.view.Gui;
-import dk.aau.mppss.friendfinder.view.fragments.MapsFragment;
-import dk.aau.mppss.friendfinder.view.fragments.POIFragment;
+import dk.aau.mppss.friendfinder.controller.facebook.FacebookController;
+import dk.aau.mppss.friendfinder.view.fragments.FacebookFragment;
 
-/*
-FragmentActivity extends ActionBarActivity so we only need to extend ActionBarActivity
-to have controls on ActionBar and FragmentActivity
- */
+
 public class MainActivity extends ActionBarActivity {
-    private MapsFragment mapsFragment;
-    private POIFragment poiFragment;
+    private FacebookController facebookController;
+    private FacebookFragment facebookFragment;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        //ActionBar SetUp:
-        if(savedInstanceState != null) {
-            this.mapsFragment = (MapsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "MapsFragment_State");
-        } else {
-            this.mapsFragment = new MapsFragment();
+        this.facebookFragment = new FacebookFragment();
+        if(this.facebookFragment != null) {
+            this.attachFragment(this.facebookFragment);
+            this.initializeFacebook();
         }
-        this.poiFragment = new POIFragment();
-
-        ActionBar actionBar = getSupportActionBar();
-        //new Gui(actionBar);
-        actionBar = Gui.actionBarConfigurations(actionBar);
-        actionBar = Gui.addTabs(
-                new ArrayList<String>(Arrays.asList("MapsModel View", "POI List")),
-                new ArrayList<Fragment>(Arrays.asList(mapsFragment, poiFragment)),
-                actionBar
-        );
     }
 
-    //Allows to replace a fragment with another:
-    public void replaceFragment(Fragment fragment) {
-        //We check if activity is finished to avoid
-        //java.lang.IllegalStateException: Activity has been destroyed exception:
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(this.callbackManager != null)
+            this.callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void initializeFacebook() {
+        LoginManager.getInstance().logOut();
+
+        this.facebookController = new FacebookController();
+        this.callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(
+                this.callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Log.d(
+                                "FB Login", "Login success" + loginResult.getRecentlyDeniedPermissions() + "-" + loginResult
+                                        .getRecentlyGrantedPermissions()
+                        );
+                        if(facebookController != null)
+                            facebookController.getResultRequest();
+                        Intent switchMapActivity = new Intent(MainActivity.this, MapsActivity.class);
+                        MainActivity.this.startActivity(switchMapActivity);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        //Log.d("FB Login", "Login canceled");
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        //Log.e("FB Login", "Login error");
+                    }
+                }
+        );
+
+        return;
+    }
+
+    //Attach (set) a fragment to the activity view:
+    private void attachFragment(Fragment fragment) {
         if(isFinishing() == false) {
-            //.commitAllowingStateLoss(); allows to commit after the previous fragment saved its Instance
-            //.commit(); doesn't ensure it and we can get exception with it:
-            this.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_fb_container, fragment)
                     .commitAllowingStateLoss();
         }
-    }
 
-    //Allowing to return to previous displayed Fragment after switching:
-    public void previousFragment() {
-        this.getSupportFragmentManager().popBackStack();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        //We saved MapsFragment in order to allow fragment backup data (for example after a
-        //rotation, it resets map so we need to store data map (marker...)):
-        getSupportFragmentManager().putFragment(outState, "MapsFragment_State", this.mapsFragment);
+        return;
     }
 }

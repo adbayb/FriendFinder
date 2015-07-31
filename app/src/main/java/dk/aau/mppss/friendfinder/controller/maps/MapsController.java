@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
 
-import dk.aau.mppss.friendfinder.MainActivity;
+import dk.aau.mppss.friendfinder.MapsActivity;
 import dk.aau.mppss.friendfinder.model.maps.CameraModel;
 import dk.aau.mppss.friendfinder.model.maps.MapsModel;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
@@ -20,17 +20,17 @@ import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
  */
 public class MapsController {
     private MapsModel maps;
-    private MainActivity mainActivity;
+    private MapsActivity mapsActivity;
 
     public MapsController(MapView mapView, LayoutInflater inflater) {
         this.maps = new MapsModel(mapView);
     }
 
-    public void enableWindowAdapter(MainActivity mainActivity, LayoutInflater inflater) {
-        if(this.mainActivity == null)
-            this.mainActivity = mainActivity;
+    public void enableWindowAdapter(MapsActivity mapsActivity, LayoutInflater inflater) {
+        if(this.mapsActivity == null)
+            this.mapsActivity = mapsActivity;
         //Set up WindowAdapter for our marker maps: (i.e. popup box when clicking on a marker):
-        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(mainActivity, inflater, true);
+        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(mapsActivity, inflater, true);
         this.maps.getGoogleMap().setInfoWindowAdapter(mapsWindowAdapter);
         this.maps.getGoogleMap().setOnInfoWindowClickListener(mapsWindowAdapter);
     }
@@ -61,9 +61,8 @@ public class MapsController {
                     @Override
                     public void onMapClick(LatLng latLng) {
                         //Log.e("Ayoub log: ", "Maps clicked! "+latLng.latitude+"-"+latLng.longitude);
-                        if(mainActivity != null)
-                            mainActivity.replaceFragment(new EditMarkerFragment());
-
+                        if(mapsActivity != null)
+                            mapsActivity.replaceFragment(new EditMarkerFragment());
                         maps.addMarker(new MarkerModel("test POI", latLng.latitude, latLng.longitude));
                     }
                 }
@@ -178,11 +177,11 @@ public class MapsController {
         this.maps = maps;
     }
 
-    public MainActivity getMainActivity() {
-        return mainActivity;
+    public MapsActivity getMapsActivity() {
+        return mapsActivity;
     }
 
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public void setMapsActivity(MapsActivity mapsActivity) {
+        this.mapsActivity = mapsActivity;
     }
 }

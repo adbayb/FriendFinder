@@ -12,7 +12,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
 
-import dk.aau.mppss.friendfinder.MainActivity;
+import dk.aau.mppss.friendfinder.MapsActivity;
 import dk.aau.mppss.friendfinder.R;
 import dk.aau.mppss.friendfinder.controller.maps.MapsController;
 
@@ -62,9 +62,9 @@ public class MapsFragment extends Fragment {
         //our MapView for Model-Controler-View interactions):
         this.mapsController.updateMapView(mapView);
         //same for inflater:
-        MainActivity mainActivity = (MainActivity) getActivity();
-        if(mainActivity != null) {
-            this.mapsController.enableWindowAdapter(mainActivity, inflater);
+        MapsActivity mapsActivity = (MapsActivity) getActivity();
+        if(mapsActivity != null) {
+            this.mapsController.enableWindowAdapter(mapsActivity, inflater);
         }
         //Log.e("AYOUB", "onCreateView ");
         return parentView;
@@ -125,8 +125,8 @@ public class MapsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         this.mapView.onDestroy();
+        super.onDestroy();
         //Log.e("AYOUB", "onDestroy ");
     }
 
