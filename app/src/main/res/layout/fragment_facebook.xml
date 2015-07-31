@@ -2,7 +2,6 @@
 <FrameLayout
     android:id="@+id/fragment_facebook"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:facebook="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,27 +13,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/fragment_facebook_login_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:textSize="15sp"
-            facebook:com_facebook_login_text="Custom Login Facebook"
-            facebook:com_facebook_logout_text="Custom Logout Facebook"/>
-        <!--
-        <Button
-            android:id="@+id/fragment_facebook_login_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Log in"/>
-        -->
         <TextView
             android:id="@+id/fragment_facebook_information"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:textColor="#000000"/>
+            android:text="Please Post your FB friends List HERE (Sekou and Cocila job)"/>
     </LinearLayout>
 </FrameLayout>

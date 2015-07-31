@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import dk.aau.mppss.friendfinder.view.Gui;
+import dk.aau.mppss.friendfinder.view.fragments.FacebookFragment;
 import dk.aau.mppss.friendfinder.view.fragments.MapsFragment;
 import dk.aau.mppss.friendfinder.view.fragments.POIFragment;
 
@@ -20,6 +21,7 @@ to have controls on ActionBar and FragmentActivity
 public class MapsActivity extends ActionBarActivity {
     private MapsFragment mapsFragment;
     private POIFragment poiFragment;
+    private FacebookFragment facebookFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,7 @@ public class MapsActivity extends ActionBarActivity {
             this.mapsFragment = new MapsFragment();
         }
         this.poiFragment = new POIFragment();
+        this.facebookFragment = new FacebookFragment();
 
         return;
     }
@@ -47,8 +50,8 @@ public class MapsActivity extends ActionBarActivity {
         //new Gui(actionBar);
         actionBar = Gui.actionBarConfigurations(actionBar);
         actionBar = Gui.addTabs(
-                new ArrayList<String>(Arrays.asList("MapsModel View", "POI List")),
-                new ArrayList<Fragment>(Arrays.asList(this.mapsFragment, this.poiFragment)),
+                new ArrayList<String>(Arrays.asList("MapsModel View", "POI List", "FB List")),
+                new ArrayList<Fragment>(Arrays.asList(this.mapsFragment, this.poiFragment, this.facebookFragment)),
                 actionBar
         );
     }
@@ -107,10 +110,12 @@ public class MapsActivity extends ActionBarActivity {
         //We saved MapsFragment in order to allow fragment backup data (for example after a
         //rotation, it resets map so we need to store data map (marker...)):
         if(this.mapsFragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.putFragment(outState, "MapsFragment_State", this.mapsFragment);
+            //check if fragment is attached to activity to avoid exception:
+            if(this.mapsFragment.isAdded()) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.putFragment(outState, "MapsFragment_State", this.mapsFragment);
+            }
         }
-
     }
 
     @Override

@@ -14,12 +14,12 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
 import dk.aau.mppss.friendfinder.controller.facebook.FacebookController;
-import dk.aau.mppss.friendfinder.view.fragments.FacebookFragment;
+import dk.aau.mppss.friendfinder.view.fragments.FacebookLoginFragment;
 
 
 public class MainActivity extends ActionBarActivity {
     private FacebookController facebookController;
-    private FacebookFragment facebookFragment;
+    private FacebookLoginFragment facebookFragment;
     private CallbackManager callbackManager;
 
     @Override
@@ -28,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_main);
 
-        this.facebookFragment = new FacebookFragment();
+        this.facebookFragment = new FacebookLoginFragment();
         if(this.facebookFragment != null) {
             this.attachFragment(this.facebookFragment);
             this.initializeFacebook();

@@ -58,7 +58,7 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
         if(this.mapsActivity != null) {
             this.mapsActivity.replaceFragment(
                     EditMarkerFragment.EditMarkerFragmentInstance(
-                            "POI Static String. Todo: Get it From Marker!"
+                            "test POI"
                     )
             );
         }
