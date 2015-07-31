@@ -8,9 +8,11 @@
     android:orientation="vertical"
     tools:context=".MapsActivity">
 
-    <ListView
-        android:id="@+id/fragment_poi_list_view"
+    <TextView
+        android:id="@+id/ItemList_txt"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="wrap_content"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"/>
 
 </FrameLayout>
