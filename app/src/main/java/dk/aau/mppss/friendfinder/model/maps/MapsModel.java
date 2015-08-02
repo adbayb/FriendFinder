@@ -19,8 +19,8 @@ public class MapsModel {
     private GoogleMap googleMap;
     private List<Marker> markersList;
 
-    public MapsModel(MapView mapView) {
-        this.googleMap = mapView.getMap();
+    public MapsModel(GoogleMap googleMap) {
+        this.googleMap = googleMap;
         this.markersList = new ArrayList<Marker>();
     }
 

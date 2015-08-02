@@ -1,18 +1,19 @@
 package dk.aau.mppss.friendfinder.controller.maps;
 
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.List;
 
-import dk.aau.mppss.friendfinder.MapsActivity;
+import dk.aau.mppss.friendfinder.R;
 import dk.aau.mppss.friendfinder.model.maps.CameraModel;
 import dk.aau.mppss.friendfinder.model.maps.MapsModel;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
+import dk.aau.mppss.friendfinder.view.Gui;
 import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
 /**
@@ -20,23 +21,19 @@ import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
  */
 public class MapsController {
     private MapsModel maps;
-    private MapsActivity mapsActivity;
+    private FragmentManager mapsChildFragmentManager;
 
-    public MapsController(MapView mapView, LayoutInflater inflater) {
-        this.maps = new MapsModel(mapView);
+    public MapsController(FragmentManager mapsChildFragmentManager, LayoutInflater inflater, GoogleMap googleMap) {
+        this.maps = new MapsModel(googleMap);
+        if(this.mapsChildFragmentManager == null)
+            this.mapsChildFragmentManager = mapsChildFragmentManager;
     }
 
-    public void enableWindowAdapter(MapsActivity mapsActivity, LayoutInflater inflater) {
-        if(this.mapsActivity == null)
-            this.mapsActivity = mapsActivity;
+    public void enableWindowAdapter(LayoutInflater inflater) {
         //Set up WindowAdapter for our marker maps: (i.e. popup box when clicking on a marker):
-        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(mapsActivity, inflater, true);
+        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(mapsChildFragmentManager, inflater, true);
         this.maps.getGoogleMap().setInfoWindowAdapter(mapsWindowAdapter);
         this.maps.getGoogleMap().setOnInfoWindowClickListener(mapsWindowAdapter);
-    }
-
-    public void updateMapView(MapView mapView) {
-        this.maps.updateMapView(mapView);
     }
 
     public void initializeMaps() {
@@ -61,8 +58,8 @@ public class MapsController {
                     @Override
                     public void onMapClick(LatLng latLng) {
                         //Log.e("Ayoub log: ", "Maps clicked! "+latLng.latitude+"-"+latLng.longitude);
-                        if(mapsActivity != null)
-                            mapsActivity.replaceFragment(new EditMarkerFragment());
+                        if(mapsChildFragmentManager != null)
+                            Gui.replaceFragment(mapsChildFragmentManager, R.id.fragment_container, new EditMarkerFragment());
                         maps.addMarker(new MarkerModel("test POI", latLng.latitude, latLng.longitude));
                     }
                 }
@@ -177,11 +174,11 @@ public class MapsController {
         this.maps = maps;
     }
 
-    public MapsActivity getMapsActivity() {
-        return mapsActivity;
+    public FragmentManager getMapsChildFragmentManager() {
+        return mapsChildFragmentManager;
     }
 
-    public void setMapsActivity(MapsActivity mapsActivity) {
-        this.mapsActivity = mapsActivity;
+    public void setMapsChildFragmentManager(FragmentManager mapsChildFragmentManager) {
+        this.mapsChildFragmentManager = mapsChildFragmentManager;
     }
 }

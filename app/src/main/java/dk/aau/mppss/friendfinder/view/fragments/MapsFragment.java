@@ -3,14 +3,13 @@ package dk.aau.mppss.friendfinder.view.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.model.Marker;
-
-import java.util.List;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 
 import dk.aau.mppss.friendfinder.MapsActivity;
 import dk.aau.mppss.friendfinder.R;
@@ -20,19 +19,7 @@ import dk.aau.mppss.friendfinder.controller.maps.MapsController;
  * A fragment that launches other parts of the demo application.
  */
 public class MapsFragment extends Fragment {
-    private MapView mapView;
     private MapsController mapsController;
-    private List<Marker> poiList;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        //setRetainInstance allows to save class property before android system event (like orientation...).
-        //But it only backup properties that are instance of Parcelable (Marker cannot be saved, so let's use Bundle instead).
-        //See http://stackoverflow.com/questions/26223770/setretaininstance-with-fragment:
-        setRetainInstance(true);
-        super.onCreate(savedInstanceState);
-        //Log.e("AYOUB", "onCreate ");
-    }
 
     @Nullable
     @Override
@@ -41,30 +28,19 @@ public class MapsFragment extends Fragment {
         //parent view automatically in function of resolution etc...:
         View parentView = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        this.mapView = (MapView) parentView.findViewById(R.id.fragment_maps_mapView);
-        this.mapView.onCreate(savedInstanceState);
-        /*
-        //From Android Developer Platform: Initializes the Google MapsModel Android API so that its classes are ready for use.
-        //If you are using MapFragment or MapView and have already obtained a (non-null) GoogleMap by calling getMap()
-        //on either of these classes, then it is not necessary to call this.
-        //So we don't this initializer since we have no
-        try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        */
+        GoogleMap googleMap = ((SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.fragment_maps_map_view))
+                .getMap();
         //Controller Initialization:
         if(this.mapsController == null) {
-            this.mapsController = new MapsController(this.mapView, inflater);
+            this.mapsController = new MapsController(this.getChildFragmentManager(), inflater, googleMap);
+            //We set a defaut camera position with animation:
+            this.mapsController.moveAnimatedCamera(58.0, 9.0, 4);
         }
-        //Each onCreateView updates MapView so we must update
-        //our MapView for Model-Controler-View interactions):
-        this.mapsController.updateMapView(mapView);
         //same for inflater:
         MapsActivity mapsActivity = (MapsActivity) getActivity();
         if(mapsActivity != null) {
-            this.mapsController.enableWindowAdapter(mapsActivity, inflater);
+            this.mapsController.enableWindowAdapter(inflater);
         }
         //Log.e("AYOUB", "onCreateView ");
         return parentView;
@@ -76,21 +52,6 @@ public class MapsFragment extends Fragment {
 
         if(this.mapsController != null) {
             this.mapsController.initializeMaps();
-            //Restore Camera state from our saved bundle:
-            if(savedInstanceState != null) {
-                double latitude = savedInstanceState.getDouble("latitude");
-                double longitude = savedInstanceState.getDouble("longitude");
-                float zoom = savedInstanceState.getFloat("zoom");
-
-                this.mapsController.moveCamera(latitude, longitude, zoom);
-            } else {
-                //We set a defaut camera position
-                this.mapsController.moveAnimatedCamera(58.0, 9.0, 4);
-            }
-            //Redraw Markers if there is an orientation modification or something else:
-            if(this.poiList != null) {
-                this.mapsController.updateMapMarkers(this.poiList);
-            }
         }
         //Log.e("AYOUB", "onActivityCreated "+ this.poiList);
     }
@@ -104,14 +65,10 @@ public class MapsFragment extends Fragment {
         //onResume isn't limited to being called after the activity has been paused, it's called whenever the activity goes to the
         //top of the activity stack. That includes the first time it's shown after it's been created.
         super.onResume();
-        this.mapView.onResume();
 
         if(this.mapsController != null) {
             this.mapsController.addPOIListener();
             this.mapsController.removePOIListener();
-            //We update POI list in order to backup our Marker View via class variable and setRetainInstance:
-            //We affect for this getPOIList reference value to poiList variable:
-            this.poiList = this.mapsController.getPOIList();
         }
         //Log.e("AYOUB", "onResume ");
     }
@@ -119,13 +76,17 @@ public class MapsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        this.mapView.onPause();
         //Log.e("AYOUB", "onPause ");
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        Log.e("AYOUB", "onStop ");
+    }
+
+    @Override
     public void onDestroy() {
-        this.mapView.onDestroy();
         super.onDestroy();
         //Log.e("AYOUB", "onDestroy ");
     }
@@ -133,16 +94,19 @@ public class MapsFragment extends Fragment {
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        this.mapView.onLowMemory();
         //Log.e("AYOUB", "onLowMemory ");
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //Save states for camera:
-        outState.putDouble("latitude", this.mapsController.getCamera().getLatitude());
-        outState.putDouble("longitude", this.mapsController.getCamera().getLongitude());
-        outState.putFloat("zoom", this.mapsController.getCamera().getZoom());
+    }
+
+    public MapsController getMapsController() {
+        return mapsController;
+    }
+
+    public void setMapsController(MapsController mapsController) {
+        this.mapsController = mapsController;
     }
 }

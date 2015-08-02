@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import dk.aau.mppss.friendfinder.MapsActivity;
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.view.Gui;
 
 /**
  * Created by adibayoub on 30/07/2015.
@@ -61,37 +61,20 @@ public class EditMarkerFragment extends Fragment {
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            MapsActivity mapsActivity = (MapsActivity) getActivity();
-                            if(mapsActivity != null) {
-                                mapsActivity.previousFragment();
+                            //We get parent fragment since EditMarkerFragment will be
+                            //added inside a fragment and not like a root fragment. For example inside
+                            //MapsFragment via getChildFragmentManager
+                            Fragment parentFragment = getParentFragment();
+                            if(parentFragment != null) {
+                                parentFragment.onStop();
+                                Gui.popFragment(
+                                        getParentFragment().getChildFragmentManager()
+                                );
                             }
                         }
                     }
             );
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-    }
-
-    public Button getButtonSave() {
-        return buttonSave;
-    }
-
-    public void setButtonSave(Button buttonSave) {
-        this.buttonSave = buttonSave;
     }
 }
 

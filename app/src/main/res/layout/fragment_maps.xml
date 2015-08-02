@@ -26,12 +26,21 @@
             tools:context=".MapsActivity" />
         -->
 
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/fragment_maps_mapView"
+        <fragment
+            android:id="@+id/fragment_maps_map_view"
             android:name="com.google.android.gms.maps.SupportMapFragment"
+            class="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
+
+        <!-- fragment_container which will be replaced by a fragment xml in substitution (for example POI editor here-->
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,6 +62,5 @@
                 android:text="@string/button_search_poi"/>
         </LinearLayout>
     </LinearLayout>
-
 
 </FrameLayout>
