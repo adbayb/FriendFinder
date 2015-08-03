@@ -62,9 +62,9 @@ public class MapsController {
                             Gui.replaceFragment(
                                     mapsChildFragmentManager,
                                     R.id.fragment_container,
-                                    new EditMarkerFragment()
+                                    EditMarkerFragment.EditMarkerFragmentInstance("", "", latLng)
                             );
-                        maps.addMarker(new MarkerModel("test POI", latLng.latitude, latLng.longitude));
+                        //maps.addMarker(new MarkerModel("test POI", latLng.latitude, latLng.longitude));
                     }
                 }
         );

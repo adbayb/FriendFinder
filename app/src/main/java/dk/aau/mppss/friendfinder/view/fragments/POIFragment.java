@@ -127,8 +127,6 @@ public class POIFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            //Context c = getActivity();
-            //adapter = new ListViewAdapter(POIFragment.getActivity().getApplicationContext(), items);
             adapter = new ListViewAdapter(getActivity(), items);
 
            // adapter = new ListViewAdapter();

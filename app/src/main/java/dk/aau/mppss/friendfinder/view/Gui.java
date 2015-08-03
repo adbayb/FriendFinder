@@ -15,9 +15,11 @@ import dk.aau.mppss.friendfinder.controller.TabController;
 /**
  * Created by adibayoub on 27/07/2015.
  */
-//Les classes static n'existent pas en Java: on peut en simuler son comportement en définissant notre classe en final
-//(ne peut pas être dérivée) et contructeur en private (ne peut pas être instancié en dehors de la classe)
-//et en définissant toutes nos fonctions en static:
+/*
+Les classes static n'existent pas en Java: on peut en simuler son comportement en définissant notre classe en final
+(ne peut pas être dérivée) et contructeur en private (ne peut pas être instancié en dehors de la classe)
+et en définissant toutes nos fonctions en static:
+*/
 public final class Gui {
     private Gui() {
 

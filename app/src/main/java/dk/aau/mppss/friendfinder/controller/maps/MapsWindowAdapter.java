@@ -28,7 +28,8 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
     public MapsWindowAdapter(FragmentManager mapsChildFragmentManager, LayoutInflater inflater, boolean isShortOverview) {
         if(this.mapsChildFragmentManager == null)
             this.mapsChildFragmentManager = mapsChildFragmentManager;
-        this.inflater = inflater;
+        if (inflater != null)
+            this.inflater = inflater;
         this.isShortOverview = isShortOverview;
     }
 
@@ -61,7 +62,9 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
                     mapsChildFragmentManager,
                     R.id.fragment_container,
                     EditMarkerFragment.EditMarkerFragmentInstance(
-                            "test POI"
+                            "test POI",
+                            "",
+                            marker.getPosition()
                     )
             );
         }
