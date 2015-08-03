@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +37,7 @@ public class FacebookController {
     }
 
     public void friendsRequest() {
+        Log.e("Token out", "" + AccessToken.getCurrentAccessToken().getToken());
         GraphRequest.newMyFriendsRequest(
                 AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONArrayCallback() {
@@ -87,6 +90,18 @@ public class FacebookController {
                 String key = jsonObject.names().getString(index);
                 Object value = jsonObject.get(jsonObject.names().getString(index));
                 listValues.put(key, value);
+
+                //get user profile picture TO IMPLEMENT inside Friend Model!!:
+                try {
+                    URL profilePicture = new URL(
+                            "http://graph.facebook.com/" + jsonObject.getString("id") + "/picture?type=large"
+                    );
+                    Log.d("JSONObject picture", "" + profilePicture);
+                }
+                catch(MalformedURLException e) {
+                    e.printStackTrace();
+                }
+
                 Log.d("JSONObject parsing", "key=" + key + " value=" + value);
             }
             catch(JSONException e) {

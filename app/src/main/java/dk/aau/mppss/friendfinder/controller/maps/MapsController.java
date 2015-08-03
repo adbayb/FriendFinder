@@ -59,7 +59,11 @@ public class MapsController {
                     public void onMapClick(LatLng latLng) {
                         //Log.e("Ayoub log: ", "Maps clicked! "+latLng.latitude+"-"+latLng.longitude);
                         if(mapsChildFragmentManager != null)
-                            Gui.replaceFragment(mapsChildFragmentManager, R.id.fragment_container, new EditMarkerFragment());
+                            Gui.replaceFragment(
+                                    mapsChildFragmentManager,
+                                    R.id.fragment_container,
+                                    new EditMarkerFragment()
+                            );
                         maps.addMarker(new MarkerModel("test POI", latLng.latitude, latLng.longitude));
                     }
                 }

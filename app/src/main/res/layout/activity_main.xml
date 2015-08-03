@@ -1,9 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    android:id="@+id/fragment_fb_container"
+<LinearLayout
+    android:id="@+id/activity_main_fb"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:facebook="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:orientation="vertical"
-    tools:context=".MainActivity"/>
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/activity_main_login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:textSize="15sp"
+            facebook:com_facebook_login_text="Login Facebook"
+            facebook:com_facebook_logout_text="Logout Facebook"/>
+        <!--
+        <Button
+            android:id="@+id/activity_main_login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Log in"/>
+        -->
+    </LinearLayout>
+</LinearLayout>

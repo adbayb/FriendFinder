@@ -2,9 +2,7 @@ package dk.aau.mppss.friendfinder;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -12,77 +10,102 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import java.util.Arrays;
+import java.util.List;
 
 import dk.aau.mppss.friendfinder.controller.facebook.FacebookController;
-import dk.aau.mppss.friendfinder.view.fragments.FacebookLoginFragment;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
     private FacebookController facebookController;
-    private FacebookLoginFragment facebookFragment;
     private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Log.d("Ayoub MainActivity", "onCreate");
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(this.getApplicationContext());
+        this.callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_main);
+        /*
+        //add a custom fragment:
+        Gui.attachFragment(
+                getSupportFragmentManager(),
+                R.id.fragment_fb_container,
+                new FacebookLoginFragment()
+        );
+        */
+    }
 
-        this.facebookFragment = new FacebookLoginFragment();
-        if(this.facebookFragment != null) {
-            this.attachFragment(this.facebookFragment);
-            this.initializeFacebook();
-        }
+    @Override
+    protected void onStop() {
+        //Log.d("Ayoub MainActivity", "onStop");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        //Log.d("Ayoub MainActivity", "onDestroy");
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onPause() {
+        //Log.d("Ayoub MainActivity", "onPause");
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        //Log.d("Ayoub MainActivity", "onResume");
+        super.onResume();
+        this.initializeFacebook();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        //Log.d("Ayoub MainActivity", "onActivityResult");
         if(this.callbackManager != null)
             this.callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void initializeFacebook() {
-        LoginManager.getInstance().logOut();
-
         this.facebookController = new FacebookController();
-        this.callbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(
-                this.callbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        Log.d(
-                                "FB Login", "Login success" + loginResult.getRecentlyDeniedPermissions() + "-" + loginResult
-                                        .getRecentlyGrantedPermissions()
-                        );
-                        if(facebookController != null)
-                            facebookController.getResultRequest();
-                        Intent switchMapActivity = new Intent(MainActivity.this, MapsActivity.class);
-                        MainActivity.this.startActivity(switchMapActivity);
-                    }
 
-                    @Override
-                    public void onCancel() {
-                        //Log.d("FB Login", "Login canceled");
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        //Log.e("FB Login", "Login error");
-                    }
-                }
+        LoginManager.getInstance().logOut();
+        LoginButton loginButton = (LoginButton) findViewById(R.id.activity_main_login_button);
+        List<String> permissionNeeds = Arrays.asList(
+                "public_profile", "email", "user_birthday", "user_friends", "user_education_history", "user_work_history"
         );
+        loginButton.setReadPermissions(permissionNeeds);
 
-        return;
-    }
+        if(this.callbackManager != null) {
+            loginButton.registerCallback(
+                    this.callbackManager, new FacebookCallback<LoginResult>() {
+                        @Override
+                        public void onSuccess(LoginResult loginResult) {
+                            //Log.d("FB Login", "Login success");
+                            if(facebookController != null)
+                                facebookController.getResultRequest();
+                            Intent switchMapActivity = new Intent(MainActivity.this, MapsActivity.class);
+                            //switchMapActivity.putStringArrayListExtra("FriendsFB", (ArrayList<Friend>)facebookController.getFriendsList());
+                            MainActivity.this.startActivity(switchMapActivity);
+                        }
 
-    //Attach (set) a fragment to the activity view:
-    private void attachFragment(Fragment fragment) {
-        if(isFinishing() == false) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_fb_container, fragment)
-                    .commitAllowingStateLoss();
+                        @Override
+                        public void onCancel() {
+                            //Log.d("FB Login", "Login canceled");
+                        }
+
+                        @Override
+                        public void onError(FacebookException e) {
+                            //Log.e("FB Login", "Login error");
+                        }
+                    }
+            );
         }
 
         return;
