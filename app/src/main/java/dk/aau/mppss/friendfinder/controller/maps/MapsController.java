@@ -31,7 +31,7 @@ public class MapsController {
 
     public void enableWindowAdapter(LayoutInflater inflater) {
         //Set up WindowAdapter for our marker maps: (i.e. popup box when clicking on a marker):
-        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(mapsChildFragmentManager, inflater, true);
+        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(this, inflater, true);
         this.maps.getGoogleMap().setInfoWindowAdapter(mapsWindowAdapter);
         this.maps.getGoogleMap().setOnInfoWindowClickListener(mapsWindowAdapter);
     }
@@ -76,6 +76,12 @@ public class MapsController {
     //@TODO implement it on a next version?
     public void movePOIListener() {
 
+    }
+
+    public void addMarker(MarkerModel markerModel) {
+        this.maps.addMarker(markerModel);
+
+        return;
     }
 
     public void removePOIListener() {
@@ -132,21 +138,17 @@ public class MapsController {
     }
 
     //TODO: getFriendsList:
-    public List<Marker> getPOIList() {
+    public List<MarkerModel> getPOIList() {
         return this.maps.getMarkersList();
     }
 
-    public boolean updateMapMarkers(List<Marker> poiMarkers) {
+    public boolean updateMapMarkers(List<MarkerModel> poiMarkers) {
         if(poiMarkers != null) {
-            for(Marker poiMarker : poiMarkers) {
+            for(MarkerModel poiMarker : poiMarkers) {
                 //Not .addMarker because we do not need to update list with new marker:
                 this.getMapsModel()
                         .addMapMarker(
-                                new MarkerModel(
-                                        poiMarker.getTitle(),
-                                        poiMarker.getPosition().latitude,
-                                        poiMarker.getPosition().longitude
-                                )
+                                poiMarker
                         );
             }
             return true;

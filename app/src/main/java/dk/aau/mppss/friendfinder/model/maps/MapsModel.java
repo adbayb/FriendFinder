@@ -17,11 +17,11 @@ import java.util.List;
  */
 public class MapsModel {
     private GoogleMap googleMap;
-    private List<Marker> markersList;
+    private List<MarkerModel> markersList;
 
     public MapsModel(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        this.markersList = new ArrayList<Marker>();
+        this.markersList = new ArrayList<MarkerModel>();
     }
 
     public void updateMapView(MapView mapView) {
@@ -52,7 +52,7 @@ public class MapsModel {
     public boolean addMarker(MarkerModel markerModel) {
         Marker marker = this.addMapMarker(markerModel);
         if (marker != null) {
-            this.markersList.add(marker);
+            this.markersList.add(markerModel);
 
             return true;
         }
@@ -70,17 +70,19 @@ public class MapsModel {
 
     public boolean removeMarkerFromList(Marker marker) {
         if (marker != null) {
-            //We must use Iterator instead of a foreach loop to avoid ConcurrentModificationException
-            //while removing an item inside the loop. Iterator remove function does it safely:
-            Iterator<Marker> itMarker = this.markersList.iterator();
-            while (itMarker.hasNext()) {
-                Marker currentMarker = itMarker.next();
-                //As when an orientation occurred, we lost markers, we restore them
-                //by creating new Markers so we must not check id object with .equals:
-                if (currentMarker.getPosition().latitude == marker.getPosition().latitude
-                        && currentMarker.getPosition().longitude == marker.getPosition().longitude) {
-                    itMarker.remove();
-                    return true;
+            if(this.markersList != null) {
+                //We must use Iterator instead of a foreach loop to avoid ConcurrentModificationException
+                //while removing an item inside the loop. Iterator remove function does it safely:
+                Iterator<MarkerModel> itMarker = this.markersList.iterator();
+                while(itMarker.hasNext()) {
+                    MarkerModel currentMarkerModel = itMarker.next();
+                    //As when an orientation occurred, we lost markers, we restore them
+                    //by creating new Markers so we must not check id object with .equals:
+                    if(currentMarkerModel.getLatitude() == marker.getPosition().latitude
+                            && currentMarkerModel.getLongitude() == marker.getPosition().longitude) {
+                        itMarker.remove();
+                        return true;
+                    }
                 }
             }
             return true;
@@ -88,9 +90,21 @@ public class MapsModel {
         return false;
     }
 
-    public int findMarkerFromList(Marker marker) {
-        int index = 0;
-
+    public MarkerModel findMarkerModelFromList(Marker marker) {
+        for(MarkerModel markerModelFromList : this.markersList) {
+            // does not seem to work well,
+            //use .equals instead of "currentMarker == marker" to check if it's same object:
+            if(markerModelFromList.getLatitude() == marker.getPosition().latitude
+                    && markerModelFromList.getLongitude() == marker.getPosition().longitude) {
+                /*Log.e(
+                        "AYOUB BUG","Found"
+                );*/
+                return markerModelFromList;
+            }
+        }
+        return null;
+        /*
+        version with List<Marker>:
         for (Marker markerFromList : this.markersList) {
             // does not seem to work well,
             //use .equals instead of "currentMarker == marker" to check if it's same object:
@@ -99,7 +113,7 @@ public class MapsModel {
             }
             index++;
         }
-        return -1;
+        */
     }
 
     public void moveCamera(CameraModel cameraModel) {
@@ -151,11 +165,11 @@ public class MapsModel {
         this.googleMap = googleMap;
     }
 
-    public List<Marker> getMarkersList() {
+    public List<MarkerModel> getMarkersList() {
         return markersList;
     }
 
-    public void setMarkersList(List<Marker> markersList) {
+    public void setMarkersList(List<MarkerModel> markersList) {
         this.markersList = markersList;
     }
 }

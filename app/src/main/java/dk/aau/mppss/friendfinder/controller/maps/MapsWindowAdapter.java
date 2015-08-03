@@ -1,6 +1,5 @@
 package dk.aau.mppss.friendfinder.controller.maps;
 
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,12 +21,12 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
     //Inflater permettant de rattacher notre fênetre Popup à la vue:
     private LayoutInflater inflater;
     private boolean isShortOverview;
-    private FragmentManager mapsChildFragmentManager;
+    private MapsController mapsController;
 
     //Add MarkerModel to get information on marker (MarkerPOIModel and MarkerUserModel must extends MarkerModel!):
-    public MapsWindowAdapter(FragmentManager mapsChildFragmentManager, LayoutInflater inflater, boolean isShortOverview) {
-        if(this.mapsChildFragmentManager == null)
-            this.mapsChildFragmentManager = mapsChildFragmentManager;
+    public MapsWindowAdapter(MapsController mapsController, LayoutInflater inflater, boolean isShortOverview) {
+        if(this.mapsController == null)
+            this.mapsController = mapsController;
         if (inflater != null)
             this.inflater = inflater;
         this.isShortOverview = isShortOverview;
@@ -57,12 +56,15 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        if(this.mapsChildFragmentManager != null) {
+        if(this.mapsController != null) {
             Gui.replaceFragment(
-                    mapsChildFragmentManager,
+                    mapsController.getMapsChildFragmentManager(),
                     R.id.fragment_container,
                     EditMarkerFragment.EditMarkerFragmentInstance(
-                            "test POI",
+                            this.mapsController.getMapsModel()
+                                    .findMarkerModelFromList(marker)
+                                    .getLabel()
+                                    .toString(),
                             "",
                             marker.getPosition()
                     )
@@ -99,11 +101,11 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
         this.isShortOverview = isShortOverview;
     }
 
-    public FragmentManager getMapsChildFragmentManager() {
-        return mapsChildFragmentManager;
+    public MapsController getMapsController() {
+        return mapsController;
     }
 
-    public void setMapsChildFragmentManager(FragmentManager mapsChildFragmentManager) {
-        this.mapsChildFragmentManager = mapsChildFragmentManager;
+    public void setMapsController(MapsController mapsController) {
+        this.mapsController = mapsController;
     }
 }

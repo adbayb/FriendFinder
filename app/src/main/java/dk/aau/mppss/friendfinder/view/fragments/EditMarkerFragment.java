@@ -11,9 +11,9 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.StaticValue;
 import dk.aau.mppss.friendfinder.controller.HttpAsyncTask;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
 import dk.aau.mppss.friendfinder.view.Gui;
@@ -36,10 +36,9 @@ public class EditMarkerFragment extends Fragment {
         EditMarkerFragment editMarkerFragment = new EditMarkerFragment();
 
         Bundle args = new Bundle();
-        /*if(name != null)
+        if(name != null)
             args.putString("name", name);
-            */
-        if (latLng != null) {
+        if(latLng != null) {
             args.putDouble("latlng_latitude", latLng.latitude);
             args.putDouble("latlng_longitude", latLng.longitude);
         }
@@ -53,7 +52,7 @@ public class EditMarkerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         //we get constructor custom parameters:
         Bundle bundle = getArguments();
-        if (bundle != null) {
+        if(bundle != null) {
             this.name = getArguments().getString("name", "");
             this.description = getArguments().getString("description", "");
         }
@@ -75,9 +74,8 @@ public class EditMarkerFragment extends Fragment {
         if(this.name != null)
             nameTextView.setText(this.name);
 
-        if (this.description != null)
+        if(this.description != null)
             descriptionTextView.setText(this.description);
-
 
 
         return parentView;
@@ -91,20 +89,29 @@ public class EditMarkerFragment extends Fragment {
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Map<String, Object> test = new HashMap<String, Object>();
+                            /*Map<String, Object> test = new HashMap<String, Object>();
                             test.put("title", nameTextView.getText().toString());
                             test.put("description", descriptionTextView.getText().toString());
                             test.put("latitude", new Double(latLng.latitude).toString());
-                            test.put("longitude", new Double(latLng.longitude).toString());
+                            test.put("longitude", new Double(latLng.longitude).toString());*/
 
                             try {
                                 HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
-                                        "http://friendfinder.alwaysdata.net/FriendFinder/create_poi.php",
-                                        test
+                                        StaticValue.urlCreatePOI,
+                                        new HashMap<String, Object>() {{
+                                            put("title", nameTextView.getText().toString());
+                                            put(
+                                                    "description", descriptionTextView.getText()
+                                                            .toString()
+                                            );
+                                            put("latitude", new Double(latLng.latitude).toString());
+                                            put("longitude", new Double(latLng.longitude).toString());
+                                        }}
                                 );
                                 httpAsyncTask.execute();
                                 //Log.e("Nydiaaaaaaaaa OK 1", "OKKKKKKKKKKKK");
-                            } catch (Exception e) {
+                            }
+                            catch(Exception e) {
                                 //Log.e("Nydiaaaaaaaaa Fail 1", e.toString());
                             }
 
@@ -119,7 +126,14 @@ public class EditMarkerFragment extends Fragment {
                                 );
                             }
 
-                            parentFragment.getMapsController().getMapsModel().addMarker(new MarkerModel(nameTextView.getText().toString(), latLng.latitude, latLng.longitude));
+                            parentFragment.getMapsController()
+                                    .getMapsModel()
+                                    .addMarker(
+                                            new MarkerModel(
+                                                    nameTextView.getText()
+                                                            .toString(), latLng.latitude, latLng.longitude
+                                            )
+                                    );
                         }
                     }
             );
