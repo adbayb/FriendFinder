@@ -1,15 +1,19 @@
 package dk.aau.mppss.friendfinder.controller.maps;
 
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.HashMap;
 import java.util.List;
 
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.StaticValue;
+import dk.aau.mppss.friendfinder.controller.HttpAsyncTask;
 import dk.aau.mppss.friendfinder.model.maps.CameraModel;
 import dk.aau.mppss.friendfinder.model.maps.MapsModel;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
@@ -22,6 +26,8 @@ import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 public class MapsController {
     private MapsModel maps;
     private FragmentManager mapsChildFragmentManager;
+
+
 
     public MapsController(FragmentManager mapsChildFragmentManager, LayoutInflater inflater, GoogleMap googleMap) {
         this.maps = new MapsModel(googleMap);
@@ -88,12 +94,32 @@ public class MapsController {
         this.maps.getGoogleMap().setOnMarkerDragListener(
                 new GoogleMap.OnMarkerDragListener() {
                     @Override
-                    public void onMarkerDragStart(Marker marker) {
+                    public void onMarkerDragStart(final Marker marker) {
                         //We simulate a long click on marker with dragger:
                         if(marker != null) {
-                            //Log.d("Before: ", maps.getMarkersList().toString());
+                            Log.d("Before: ", String.valueOf(marker.getPosition().longitude));
+
                             //maps.removeMarkerFromList(marker.getPosition().latitude, marker.getPosition().longitude);
                             getMapsModel().removeMarker(marker);
+
+                            /******Begin --- Created by Nydia ***********/
+                            try{
+                                HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
+                                        StaticValue.urlDeletePOI,
+                                        new HashMap<String, Object>() {{
+                                            put("latitude", String.valueOf(marker.getPosition().latitude));
+                                            put("longitude", String.valueOf(marker.getPosition().longitude));
+                                        }}
+                                );
+                                httpAsyncTask.execute();
+                                Log.e("Remove Element Pas 1", "OK");
+                            }
+                            catch(Exception e) {
+                                Log.e("Remove Element Fail 1", e.toString());
+                            }
+                            /******End --- Created by Nydia ***********/
+
+
                             //Log.d("After: ", maps.getMarkersList().toString());
                         }
                         return;

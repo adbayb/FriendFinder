@@ -1,6 +1,7 @@
 package dk.aau.mppss.friendfinder.controller;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -36,7 +37,7 @@ public class HttpAsyncTask extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... params) {
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(StaticValue.urlCreatePOI);
+        HttpPost httppost = new HttpPost(this.urlRequest);
 
         try {
             List<NameValuePair> args = new ArrayList<NameValuePair>(2);
@@ -49,9 +50,9 @@ public class HttpAsyncTask extends AsyncTask<String, String, String> {
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
             //entity.getContent();
-            //Log.e("pass 1", "connection success ");
+            Log.e("pass 1", this.urlRequest);
         } catch (Exception e) {
-            //Log.e("Fail 1", e.toString());
+            Log.e("Fail 1", e.toString());
         }
         return null;
     }

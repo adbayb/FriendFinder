@@ -11,6 +11,11 @@ public final class StaticValue {
     public static final int userID = 1;
     public static final String urlCreatePOI = "http://friendfinder.alwaysdata.net/FriendFinder/create_poi.php";
     public static final String urlGetAllPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php";
+    /******Begin --- Created by Nydia ***********/
+    public static final String urlDeletePOI = "http://friendfinder.alwaysdata.net/FriendFinder/delete_poi.php";
+    /******End --- Created by Nydia ***********/
+
+
     private List<? extends MarkerModel> markers;
 
     private StaticValue() {
