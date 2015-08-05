@@ -3,25 +3,27 @@ package dk.aau.mppss.friendfinder.model.maps;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by adibayoub on 28/07/2015.
  */
 public class MapsModel {
     private GoogleMap googleMap;
-    private List<MarkerModel> markersList;
+    //Changement List en Map pour optimiser la recherche d'un
+    //MarkerModel depuis la latitude et longitude d'un Marker en clé:
+    private Map<String, MarkerModel> markersList;
 
     public MapsModel(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        this.markersList = new ArrayList<MarkerModel>();
+        this.markersList = new HashMap<String, MarkerModel>();
     }
 
     public void updateMapView(MapView mapView) {
@@ -29,12 +31,12 @@ public class MapsModel {
     }
 
     //addMarker only on map but not on the list:
-    public Marker addMapMarker(MarkerModel markerModel) {
-        if (markerModel != null) {
+    public Marker addMapMarker(MarkerModel markerModel, int idIconImage) {
+        if(markerModel != null) {
 
             MarkerOptions markerOptions = new MarkerOptions().position(
                     new LatLng(markerModel.getLatitude(), markerModel.getLongitude())
-            ).title(markerModel.getLabel());
+            ).title(markerModel.getLabel()).icon(BitmapDescriptorFactory.fromResource(idIconImage));
             //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
             //.icon(BitmapDescriptorFactory.fromResource(R.drawable.arrow))
 
@@ -49,18 +51,22 @@ public class MapsModel {
     }
 
     //addMarker to map and list both:
-    public boolean addMarker(MarkerModel markerModel) {
-        Marker marker = this.addMapMarker(markerModel);
-        if (marker != null) {
-            this.markersList.add(markerModel);
+    public Marker addMarker(MarkerModel markerModel, int idIconImage) {
+        Marker marker = this.addMapMarker(markerModel, idIconImage);
+        if(marker != null) {
+            if(this.markersList != null) {
+                String key = marker.getPosition().latitude + "-" + marker.getPosition().longitude;
+                this.markersList.put(key, markerModel);
 
-            return true;
+                return marker;
+            }
+            return null;
         }
-        return false;
+        return null;
     }
 
     public boolean removeMarker(Marker marker) {
-        if (marker != null) {
+        if(marker != null) {
             this.removeMarkerFromList(marker);
             marker.remove();
             return true;
@@ -68,6 +74,34 @@ public class MapsModel {
         return false;
     }
 
+    public boolean removeMarkerFromList(Marker marker) {
+        String searchKey = marker.getPosition().latitude + "-" + marker.getPosition().longitude;
+
+        return (
+                (this.markersList.get(searchKey) == null) ? false : true
+        );
+    }
+
+    //Optimisation recherche marker spécifique dans Map via une clé unique définit par latitude et longitude:
+    public MarkerModel findMarkerModelFromMarker(Marker marker) {
+        if(marker != null) {
+            String searchKey = marker.getPosition().latitude + "-" + marker.getPosition().longitude;
+            //returns null if not found:
+            return this.markersList.get(searchKey);
+        }
+        return null;
+    }
+
+    public MarkerModel findMarkerModelFromPosition(LatLng latLng) {
+        if(latLng != null) {
+            String searchKey = latLng.latitude + "-" + latLng.longitude;
+
+            return this.markersList.get(searchKey);
+        }
+        return null;
+    }
+
+    /*
     public boolean removeMarkerFromList(Marker marker) {
         if (marker != null) {
             if(this.markersList != null) {
@@ -96,25 +130,12 @@ public class MapsModel {
             //use .equals instead of "currentMarker == marker" to check if it's same object:
             if(markerModelFromList.getLatitude() == marker.getPosition().latitude
                     && markerModelFromList.getLongitude() == marker.getPosition().longitude) {
-                /*Log.e(
-                        "AYOUB BUG","Found"
-                );*/
                 return markerModelFromList;
             }
         }
         return null;
-        /*
-        version with List<Marker>:
-        for (Marker markerFromList : this.markersList) {
-            // does not seem to work well,
-            //use .equals instead of "currentMarker == marker" to check if it's same object:
-            if (markerFromList.equals(marker)) {
-                return index;
-            }
-            index++;
-        }
-        */
     }
+    */
 
     public void moveCamera(CameraModel cameraModel) {
         this.googleMap.moveCamera(
@@ -165,11 +186,11 @@ public class MapsModel {
         this.googleMap = googleMap;
     }
 
-    public List<MarkerModel> getMarkersList() {
+    public Map<String, MarkerModel> getMarkersList() {
         return markersList;
     }
 
-    public void setMarkersList(List<MarkerModel> markersList) {
+    public void setMarkersList(Map<String, MarkerModel> markersList) {
         this.markersList = markersList;
     }
 }

@@ -123,17 +123,17 @@ public class POIFragment extends Fragment {
             try {
                 obj = new JSONObject(result);
                 items = obj.getJSONArray("poi");
-            } catch (JSONException e) {
+            }
+            catch(JSONException e) {
                 e.printStackTrace();
             }
 
             adapter = new ListViewAdapter(getActivity(), items);
 
-           // adapter = new ListViewAdapter();
-            if (myList.getAdapter() == null) {
+            // adapter = new ListViewAdapter();
+            if(myList.getAdapter() == null) {
                 myList.setAdapter(adapter);
-            }
-            else {
+            } else {
                 adapter.notifyDataSetChanged();
             }
 
@@ -158,28 +158,33 @@ public class POIFragment extends Fragment {
         private String title;
         private String description;
 
-      //  public ListViewAdapter(Context context, JSONArray arr) {
-      public ListViewAdapter(Activity context, JSONArray arr) {
+        //  public ListViewAdapter(Context context, JSONArray arr) {
+        public ListViewAdapter(Activity context, JSONArray arr) {
             //this.context = context;
-            this.context = getActivity();
-            this.fields = new ArrayList<String>();
-            for (int i=0; i<arr.length(); ++i) {
-                try {
-                    curr_obj = arr.getJSONObject(i);
-                    title = curr_obj.getString("title");
-                    description = curr_obj.getString("description");
-                    fields.add(title + " : " + description);
-                    //fields.add(arr.getJSONObject(i).getString("title"));
-                    //arr.getJSONObject(i).toString();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            if(arr != null) {
+                this.context = getActivity();
+                this.fields = new ArrayList<String>();
+                for(int i = 0; i < arr.length(); ++i) {
+                    try {
+                        curr_obj = arr.getJSONObject(i);
+                        title = curr_obj.getString("title");
+                        description = curr_obj.getString("description");
+                        fields.add(title + " : " + description);
+                        //fields.add(arr.getJSONObject(i).getString("title"));
+                        //arr.getJSONObject(i).toString();
+                    }
+                    catch(JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
 
         @Override
         public int getCount() {
-            return fields.size();
+            if(fields != null)
+                return fields.size();
+            return 0;
         }
 
         @Override
@@ -195,7 +200,7 @@ public class POIFragment extends Fragment {
         @Override
         public View getView(int position, View convertView, ViewGroup viewGroup) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-           // myList = (ListView) parentView.findViewById(R.id.Lists_notificationsListview);
+            // myList = (ListView) parentView.findViewById(R.id.Lists_notificationsListview);
 
             convertView = inflater.inflate(R.layout.poi_listview_item, null);
             TextView txt = (TextView) convertView.findViewById(R.id.ItemList_txt);
@@ -208,7 +213,6 @@ public class POIFragment extends Fragment {
         }
 
     }
-
 
 
 }

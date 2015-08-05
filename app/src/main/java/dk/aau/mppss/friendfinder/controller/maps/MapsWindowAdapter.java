@@ -1,5 +1,6 @@
 package dk.aau.mppss.friendfinder.controller.maps;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -9,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
 import dk.aau.mppss.friendfinder.view.Gui;
 import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
@@ -23,11 +25,13 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
     private boolean isShortOverview;
     private MapsController mapsController;
 
+    private Bitmap bmp;
+
     //Add MarkerModel to get information on marker (MarkerPOIModel and MarkerUserModel must extends MarkerModel!):
     public MapsWindowAdapter(MapsController mapsController, LayoutInflater inflater, boolean isShortOverview) {
         if(this.mapsController == null)
             this.mapsController = mapsController;
-        if (inflater != null)
+        if(inflater != null)
             this.inflater = inflater;
         this.isShortOverview = isShortOverview;
     }
@@ -48,7 +52,7 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
         if(this.isShortOverview == true) {
             this.setShortOverview(windowView, marker);
         } else {
-            //TODO for Long card overview?
+            //TODO: Long card overview like Twitter?
         }
 
         return windowView;
@@ -57,20 +61,20 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
     @Override
     public void onInfoWindowClick(Marker marker) {
         if(this.mapsController != null) {
-            Gui.replaceFragment(
-                    mapsController.getMapsChildFragmentManager(),
-                    R.id.fragment_container,
-                    EditMarkerFragment.EditMarkerFragmentInstance(
-                            this.mapsController.getMapsModel()
-                                    .findMarkerModelFromList(marker)
-                                    .getLabel()
-                                    .toString(),
-                            "",
-                            marker.getPosition()
-                    )
-            );
+            //We can edit only POI Markers and not a FB Friend marker (both we can show window info):
+            POIMarkerModel poiMarkerModel = this.mapsController.findPOIMarkerModelFromList(marker);
+            if(poiMarkerModel != null) {
+                Gui.replaceFragment(
+                        mapsController.getMapsChildFragmentManager(),
+                        R.id.fragment_container,
+                        EditMarkerFragment.Update(
+                                poiMarkerModel,
+                                marker
+                        )
+                );
+            }
         }
-        //Log.e("AYOUB onInfoWinClick",""+this.mapsFragment);
+        //Log.e("AYOUB onInfoWinClick", "Click");
         return;
     }
 

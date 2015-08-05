@@ -39,6 +39,46 @@ public class MainActivity extends AppCompatActivity {
         */
     }
 
+    public void initializeFacebook() {
+        this.facebookController = new FacebookController();
+
+        LoginManager.getInstance().logOut();
+        LoginButton loginButton = (LoginButton) findViewById(R.id.activity_main_login_button);
+        List<String> permissionNeeds = Arrays.asList(
+                "public_profile", "email", "user_birthday", "user_friends", "user_education_history", "user_work_history"
+        );
+        loginButton.setReadPermissions(permissionNeeds);
+
+        if(this.callbackManager != null) {
+            loginButton.registerCallback(
+                    this.callbackManager, new FacebookCallback<LoginResult>() {
+                        @Override
+                        public void onSuccess(LoginResult loginResult) {
+                            //Log.d("FB Login", "Login success");
+                            if(facebookController != null) {
+                                facebookController.getResultRequest(MainActivity.this);
+                                //Log.e("Attention3", facebookController.getUser().toString());
+                            }
+                            //For switch activities cf getResultRequest function because We must
+                            //switch activities only after completed FB Request:
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            //Log.d("FB Login", "Login canceled");
+                        }
+
+                        @Override
+                        public void onError(FacebookException e) {
+                            //Log.e("FB Login", "Login error");
+                        }
+                    }
+            );
+        }
+
+        return;
+    }
+
     @Override
     protected void onStop() {
         //Log.d("Ayoub MainActivity", "onStop");
@@ -70,44 +110,5 @@ public class MainActivity extends AppCompatActivity {
         if(this.callbackManager != null)
             this.callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    public void initializeFacebook() {
-        this.facebookController = new FacebookController();
-
-        LoginManager.getInstance().logOut();
-        LoginButton loginButton = (LoginButton) findViewById(R.id.activity_main_login_button);
-        List<String> permissionNeeds = Arrays.asList(
-                "public_profile", "email", "user_birthday", "user_friends", "user_education_history", "user_work_history"
-        );
-        loginButton.setReadPermissions(permissionNeeds);
-
-        if(this.callbackManager != null) {
-            loginButton.registerCallback(
-                    this.callbackManager, new FacebookCallback<LoginResult>() {
-                        @Override
-                        public void onSuccess(LoginResult loginResult) {
-                            //Log.d("FB Login", "Login success");
-                            if(facebookController != null)
-                                facebookController.getResultRequest();
-                            Intent switchMapActivity = new Intent(MainActivity.this, MapsActivity.class);
-                            //switchMapActivity.putStringArrayListExtra("FriendsFB", (ArrayList<Friend>)facebookController.getFriendsList());
-                            MainActivity.this.startActivity(switchMapActivity);
-                        }
-
-                        @Override
-                        public void onCancel() {
-                            //Log.d("FB Login", "Login canceled");
-                        }
-
-                        @Override
-                        public void onError(FacebookException e) {
-                            //Log.e("FB Login", "Login error");
-                        }
-                    }
-            );
-        }
-
-        return;
     }
 }

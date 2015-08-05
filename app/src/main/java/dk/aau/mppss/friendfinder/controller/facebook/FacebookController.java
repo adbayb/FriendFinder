@@ -1,5 +1,7 @@
 package dk.aau.mppss.friendfinder.controller.facebook;
 
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.facebook.AccessToken;
@@ -10,34 +12,36 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dk.aau.mppss.friendfinder.MapsActivity;
+import dk.aau.mppss.friendfinder.UtilityClass;
 import dk.aau.mppss.friendfinder.model.facebook.Friend;
+import dk.aau.mppss.friendfinder.model.facebook.User;
 
 /**
  * Created by adibayoub on 30/07/2015.
  */
 public class FacebookController {
     private List<Friend> friendsList;
+    private User user;
 
     public FacebookController() {
         this.friendsList = new ArrayList<Friend>();
+        this.user = null;
     }
 
-    public void getResultRequest() {
-        this.friendsRequest();
-        this.meRequest();
+    public void getResultRequest(AppCompatActivity context) {
+        this.friendsRequest(context);
+        this.meRequest(context);
 
         return;
     }
 
-    public void friendsRequest() {
-        Log.e("Token out", "" + AccessToken.getCurrentAccessToken().getToken());
+    public void friendsRequest(AppCompatActivity context) {
+        //Log.e("Token out", "" + AccessToken.getCurrentAccessToken().getToken());
         GraphRequest.newMyFriendsRequest(
                 AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONArrayCallback() {
@@ -45,7 +49,9 @@ public class FacebookController {
                     public void onCompleted(JSONArray jsonArray, GraphResponse graphResponse) {
                         for(int index = 0; index < jsonArray.length(); index++) {
                             try {
-                                Map<String, Object> jsonMapObject = parseJSONObject(jsonArray.getJSONObject(index));
+                                Map<String, Object> jsonMapObject = UtilityClass.parseJSONObject(
+                                        jsonArray.getJSONObject(index)
+                                );
                                 populateFriendsList(jsonMapObject);
                             }
                             catch(JSONException e) {
@@ -59,18 +65,59 @@ public class FacebookController {
         return;
     }
 
-    public void meRequest() {
+    public void meRequest(AppCompatActivity context) {
+        final AppCompatActivity activity = context;
         GraphRequest.newMeRequest(
                 AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
-                        parseJSONObject(jsonObject);
+                        Map<String, Object> jsonKeyValue = UtilityClass.parseJSONObject(jsonObject);
+                        user = new User(
+                                jsonKeyValue.get("id").toString(), jsonKeyValue.get("name")
+                                .toString(), null, null
+                        );
+                        //We must switch activities only after completed FB Request:
+                        Intent switchMapActivity = new Intent(activity, MapsActivity.class);
+                        switchMapActivity.putExtra(
+                                "userFBId", user.getId().toString()
+                        );
+                        activity.startActivity(switchMapActivity);
                     }
                 }
         ).executeAsync();
 
         return;
+    }
+
+    //Private functions: utility class functions:
+    private boolean populateFriendsList(Map<String, Object> jsonKeyValue) {
+        if(jsonKeyValue != null) {
+            /*
+            String id = new String();
+            String name = new String();
+            for(Map.Entry<String, Object> jsonEntry : jsonKeyValue.entrySet()) {
+                String key = jsonEntry.getKey();
+                //see http://perso.ensta-paristech.fr/~diam/java/online/notes-java/data/expressions/22compareobjects.html
+                if(key.equals("id")) id = jsonEntry.getValue().toString();
+                else if(key.equals("name")) name = jsonEntry.getValue().toString();
+                //and so on...
+            }
+            */
+            friendsList.add(
+                    new Friend(
+                            jsonKeyValue.get("id").toString(),
+                            jsonKeyValue.get("name").toString(),
+                            null,
+                            null
+                    )
+            );
+            Log.e("Ayoub", friendsList.toString());
+
+            return true;
+        }
+
+        return false;
     }
 
     public List<Friend> getFriendsList() {
@@ -81,54 +128,11 @@ public class FacebookController {
         this.friendsList = friendsList;
     }
 
-    //Private functions: utility class functions:
-    private Map<String, Object> parseJSONObject(JSONObject jsonObject) {
-        Map<String, Object> listValues = new HashMap<String, Object>();
-        //jsonObject.names() : names <=> key
-        for(int index = 0; index < jsonObject.names().length(); index++) {
-            try {
-                String key = jsonObject.names().getString(index);
-                Object value = jsonObject.get(jsonObject.names().getString(index));
-                listValues.put(key, value);
-
-                //get user profile picture TO IMPLEMENT inside Friend Model!!:
-                try {
-                    URL profilePicture = new URL(
-                            "http://graph.facebook.com/" + jsonObject.getString("id") + "/picture?type=large"
-                    );
-                    Log.d("JSONObject picture", "" + profilePicture);
-                }
-                catch(MalformedURLException e) {
-                    e.printStackTrace();
-                }
-
-                Log.d("JSONObject parsing", "key=" + key + " value=" + value);
-            }
-            catch(JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return listValues;
+    public User getUser() {
+        return user;
     }
 
-    private boolean populateFriendsList(Map<String, Object> jsonKeyValue) {
-        if(jsonKeyValue != null) {
-            String id = new String();
-            String name = new String();
-            for(Map.Entry<String, Object> jsonEntry : jsonKeyValue.entrySet()) {
-                String key = jsonEntry.getKey();
-                //see http://perso.ensta-paristech.fr/~diam/java/online/notes-java/data/expressions/22compareobjects.html
-                if(key.equals("id")) id = jsonEntry.getValue().toString();
-                else if(key.equals("name")) name = jsonEntry.getValue().toString();
-                //and so on...
-            }
-            friendsList.add(new Friend(id, name));
-            Log.e("Ayoub", friendsList.toString());
-
-            return true;
-        }
-
-        return false;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

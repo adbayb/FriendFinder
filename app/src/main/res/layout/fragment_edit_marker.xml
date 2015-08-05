@@ -51,9 +51,15 @@
             android:src="@mipmap/ic_launcher"/>
         -->
         <Button
-            android:id="@+id/fragment_edit_marker_button"
+            android:id="@+id/fragment_edit_marker_save_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save"/>
+
+        <Button
+            android:id="@+id/fragment_edit_marker_delete_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete"/>
     </LinearLayout>
 </FrameLayout>

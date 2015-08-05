@@ -7,6 +7,7 @@ public class MarkerModel {
     private double latitude;
     private double longitude;
     private String label;
+    //Add color marker!
 
     public MarkerModel(String label, double latitude, double longitude) {
         this.latitude = latitude;

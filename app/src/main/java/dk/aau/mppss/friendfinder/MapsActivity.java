@@ -24,6 +24,12 @@ public class MapsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        Bundle fromFBActivity = getIntent().getExtras();
+        if(fromFBActivity != null) {
+            UtilityClass.setUserID(fromFBActivity.getString("userFBId"));
+            //Log.e("AYOUBBBBBBBBBBBBBBBB", UtilityClass.getUserID());
+        }
+
         Gui.createGui(
                 this,
                 new ArrayList<String>(Arrays.asList("Maps View", "POI List", "FB List")),

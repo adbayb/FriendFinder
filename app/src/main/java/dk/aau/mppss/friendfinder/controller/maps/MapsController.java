@@ -7,12 +7,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dk.aau.mppss.friendfinder.R;
 import dk.aau.mppss.friendfinder.model.maps.CameraModel;
+import dk.aau.mppss.friendfinder.model.maps.FBMarkerModel;
 import dk.aau.mppss.friendfinder.model.maps.MapsModel;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
+import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
 import dk.aau.mppss.friendfinder.view.Gui;
 import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
@@ -22,18 +26,26 @@ import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 public class MapsController {
     private MapsModel maps;
     private FragmentManager mapsChildFragmentManager;
+    private MapsWindowAdapter mapsWindowAdapter;
 
     public MapsController(FragmentManager mapsChildFragmentManager, LayoutInflater inflater, GoogleMap googleMap) {
         this.maps = new MapsModel(googleMap);
         if(this.mapsChildFragmentManager == null)
             this.mapsChildFragmentManager = mapsChildFragmentManager;
+
+        //Set up WindowAdapter for our marker maps: (i.e. popup box when clicking on a marker):
+        if(inflater != null) {
+            this.mapsWindowAdapter = new MapsWindowAdapter(this, inflater, true);
+            this.maps.getGoogleMap().setInfoWindowAdapter(mapsWindowAdapter);
+        }
     }
 
-    public void enableWindowAdapter(LayoutInflater inflater) {
-        //Set up WindowAdapter for our marker maps: (i.e. popup box when clicking on a marker):
-        MapsWindowAdapter mapsWindowAdapter = new MapsWindowAdapter(this, inflater, true);
-        this.maps.getGoogleMap().setInfoWindowAdapter(mapsWindowAdapter);
+    public void enableWindowAdapter() {
         this.maps.getGoogleMap().setOnInfoWindowClickListener(mapsWindowAdapter);
+    }
+
+    public void disableWindowAdapter() {
+        this.maps.getGoogleMap().setOnInfoWindowClickListener(null);
     }
 
     public void initializeMaps() {
@@ -62,9 +74,23 @@ public class MapsController {
                             Gui.replaceFragment(
                                     mapsChildFragmentManager,
                                     R.id.fragment_container,
-                                    EditMarkerFragment.EditMarkerFragmentInstance("", "", latLng)
+                                    EditMarkerFragment.Create(latLng)
                             );
                         //maps.addMarker(new MarkerModel("test POI", latLng.latitude, latLng.longitude));
+                    }
+                }
+        );
+
+        return;
+    }
+
+    //Nous stoppons l'ajout de POI avec Edit Fragment en overwrittant le listener afin d'effectuer aucune action:
+    public void stopAddPOIListener() {
+        this.maps.getGoogleMap().setOnMapClickListener(
+                new GoogleMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(LatLng latLng) {
+                        return;
                     }
                 }
         );
@@ -78,12 +104,24 @@ public class MapsController {
 
     }
 
-    public void addMarker(MarkerModel markerModel) {
-        this.maps.addMarker(markerModel);
+    public Marker addPOIMarker(POIMarkerModel poiMarkerModel) {
+        Marker marker = this.maps.addMarker(poiMarkerModel, R.drawable.poi);
+        //Log.e("Avant", poiMarkerModel.toString());
+        //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
 
-        return;
+        return marker;
     }
 
+    public Marker addFBMarker(FBMarkerModel fbMarkerModel) {
+        Marker marker = this.maps.addMarker(fbMarkerModel, R.drawable.user);
+        //Log.e("Avant", poiMarkerModel.toString());
+        //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
+
+        return marker;
+    }
+
+    /*
+    //Trop imprécis puisque nous ne récupérons pas la position initiale avant drag & drop:
     public void removePOIListener() {
         this.maps.getGoogleMap().setOnMarkerDragListener(
                 new GoogleMap.OnMarkerDragListener() {
@@ -112,6 +150,7 @@ public class MapsController {
 
         return;
     }
+    */
 
     //get Informations with a popup box from a click on POI marker:
     public void getPOIListener() {
@@ -137,23 +176,43 @@ public class MapsController {
         return;
     }
 
-    //TODO: getFriendsList:
-    public List<MarkerModel> getPOIList() {
-        return this.maps.getMarkersList();
+    public POIMarkerModel findPOIMarkerModelFromList(Marker marker) {
+        MarkerModel markerModel = this.maps.findMarkerModelFromMarker(marker);
+        if(markerModel != null) {
+            if(markerModel instanceof POIMarkerModel) {
+                return (POIMarkerModel) markerModel;
+            }
+        }
+
+        return null;
     }
 
-    public boolean updateMapMarkers(List<MarkerModel> poiMarkers) {
-        if(poiMarkers != null) {
-            for(MarkerModel poiMarker : poiMarkers) {
-                //Not .addMarker because we do not need to update list with new marker:
-                this.getMapsModel()
-                        .addMapMarker(
-                                poiMarker
-                        );
+    public List<POIMarkerModel> getPOIList() {
+        List<POIMarkerModel> poiMarkerModels = new ArrayList<POIMarkerModel>();
+        Map<String, MarkerModel> markersList = this.maps.getMarkersList();
+
+        for(Map.Entry markerList : markersList.entrySet()) {
+            MarkerModel markerModel = (MarkerModel) markerList.getValue();
+            if(markerModel instanceof POIMarkerModel) {
+                //Log.e("Key POI List", markerList.getKey().toString());
+                poiMarkerModels.add((POIMarkerModel) markerModel);
             }
-            return true;
         }
-        return false;
+        return poiMarkerModels;
+    }
+
+    public List<FBMarkerModel> getFBList() {
+        List<FBMarkerModel> fbMarkerModels = new ArrayList<FBMarkerModel>();
+        Map<String, MarkerModel> markersList = this.maps.getMarkersList();
+
+        for(Map.Entry markerList : markersList.entrySet()) {
+            MarkerModel markerModel = (MarkerModel) markerList.getValue();
+            if(markerModel instanceof FBMarkerModel) {
+                //Log.e("Key FB List", markerList.getKey().toString());
+                fbMarkerModels.add((FBMarkerModel) markerModel);
+            }
+        }
+        return fbMarkerModels;
     }
 
     public void moveAnimatedCamera(double latitude, double longitude, float zoom) {
