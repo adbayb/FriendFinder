@@ -10,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
 import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
 import dk.aau.mppss.friendfinder.view.Gui;
 import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
@@ -83,9 +84,11 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
         TextView description = (TextView) view.findViewById(R.id.window_adapter_description);
         ImageView icon = (ImageView) view.findViewById(R.id.window_adapter_icon);
 
-        POIMarkerModel poiMarkerModel = this.mapsController.findPOIMarkerModelFromList(marker);
-        title.setText(poiMarkerModel.getLabel());
-        description.setText(poiMarkerModel.getDescription());
+        MarkerModel markerModel = this.mapsController.findMarkerModelFromList(marker);
+        title.setText(markerModel.getLabel());
+        if(markerModel instanceof POIMarkerModel) {
+            //description.setText((POIMarkerModel)(markerModel).getDescription());
+        }
         //TODO gestion icon:
         //icon.setImageDrawable();
     }

@@ -1,6 +1,7 @@
 package dk.aau.mppss.friendfinder.controller.maps;
 
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -162,6 +163,8 @@ public class MapsController {
                 new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
+
+                        Log.e("DEBUGGGGGG44", "" + marker);
                         if(marker != null) {
                             //Log.d("Before: ", maps.getMarkersList().toString());
                             //maps.removeMarkerFromList(marker.getPosition().latitude, marker.getPosition().longitude);
@@ -183,12 +186,18 @@ public class MapsController {
     public POIMarkerModel findPOIMarkerModelFromList(Marker marker) {
         MarkerModel markerModel = this.maps.findMarkerModelFromMarker(marker);
         if(markerModel != null) {
+            Log.e("DEBUG33333", "PASS NOT NULL");
             if(markerModel instanceof POIMarkerModel) {
+                Log.e("DEBUG33333", "PASS INSTANCE");
                 return (POIMarkerModel) markerModel;
             }
         }
 
         return null;
+    }
+
+    public MarkerModel findMarkerModelFromList(Marker marker) {
+        return this.maps.findMarkerModelFromMarker(marker);
     }
 
     public List<POIMarkerModel> getPOIList() {

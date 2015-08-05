@@ -13,29 +13,23 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.List;
-import java.util.Map;
 
 import dk.aau.mppss.friendfinder.R;
-import dk.aau.mppss.friendfinder.UtilityClass;
 import dk.aau.mppss.friendfinder.controller.HttpAsyncTask;
-import dk.aau.mppss.friendfinder.controller.OnHttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.maps.MapsController;
+import dk.aau.mppss.friendfinder.controller.maps.MapsFBHttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.maps.MapsLocationListener;
 import dk.aau.mppss.friendfinder.controller.maps.MapsNotificationController;
+import dk.aau.mppss.friendfinder.controller.maps.MapsPOIHttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.maps.OnMapsLocationListener;
 import dk.aau.mppss.friendfinder.model.maps.FBMarkerModel;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
-import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
 
 /**
  * A fragment that launches other parts of the demo application.
  */
-public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLocationListener {
+public class MapsFragment extends Fragment implements OnMapsLocationListener {
     private MapsController mapsController;
     private List<? extends MarkerModel> sqlMarkers;
     private FBMarkerModel userMarker;
@@ -70,17 +64,24 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
 
         if(this.mapsController != null) {
             this.mapsController.initializeMaps();
+
+            HttpAsyncTask poiHttpAsyncTask = new HttpAsyncTask(
+                    new MapsPOIHttpAsyncTask(this.mapsController),
+                    "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php"
+            );
+            poiHttpAsyncTask.execute();
+
+            //TODO Sekou modifier URL php WS:
+            HttpAsyncTask fbHttpAsyncTask = new HttpAsyncTask(
+                    new MapsFBHttpAsyncTask(this.mapsController),
+                    "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php"
+            );
+            fbHttpAsyncTask.execute();
+
+            //TODO retrieve informations from DB see with Sekou:
+            this.userMarker = this.mapsController.setUserMarker(new FBMarkerModel("AYOUBBBB", "MyMarker", 1.2, 3.4, null));
+            //Log.e("AYOUB", "onActivityCreated ");
         }
-
-        HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
-                this,
-                "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php"
-        );
-        httpAsyncTask.execute();
-
-        //TODO retrieve informations from DB see with Sekou:
-        this.userMarker = this.mapsController.setUserMarker(new FBMarkerModel("AYOUBBBB", "MyMarker", 1.2, 3.4, null));
-        //Log.e("AYOUB", "onActivityCreated ");
     }
 
     @Override
@@ -166,52 +167,32 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
     }
 
     @Override
-    public void onHttpAsyncTaskCompleted(String result) {
-        //Log.e("AYOUB", "onPostExecute");
-        try {
-            JSONObject jsonObject = new JSONObject(result);
-            if(jsonObject != null) {
-                JSONArray jsonArray = jsonObject.getJSONArray("poi");
-                if(jsonArray != null) {
-                    Map<String, Object> poiSQLList = null;
-                    for(int index = 0; index < jsonArray.length(); index++) {
-                        poiSQLList = UtilityClass.parseJSONObject(jsonArray.getJSONObject(index));
-                        if(poiSQLList != null) {
-                            mapsController.addPOIMarker(
-                                    new POIMarkerModel(
-                                            poiSQLList.get("title").toString(),
-                                            poiSQLList.get("description").toString(),
-                                            Double.parseDouble(
-                                                    poiSQLList.get("latitude")
-                                                            .toString()
-                                            ),
-                                            Double.parseDouble(
-                                                    poiSQLList.get("longitude")
-                                                            .toString()
-                                            ),
-                                            null
-                                    )
-                            );
-                        }
-                    }
-                    Log.e("AYOUB List POI", this.mapsController.getPOIList().toString());
-                    Log.e("AYOUB List FBBBB", this.mapsController.getFBList().toString());
-                }
-            }
-        }
-        catch(JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public void getInitialLocation(Location location) {
         //Log.e("AAAAAAA", "initial Localisation" + location.getLatitude() + "-" + location.getLongitude());
         //Set User Marker:
         if(this.userMarker != null) {
+            FBMarkerModel test = (FBMarkerModel) this.mapsController.getMapsModel()
+                    .getMarkersList()
+                    .get(this.userMarker.getLatitude() + "-" + this.userMarker.getLongitude());
+            Log.e(
+                    "DEBUGGG", "" + test + "BEFORE" + this.mapsController.getMapsModel()
+                            .getMarkersList()
+                            .toString()
+            );
+            if(test != null)
+                this.mapsController.getMapsModel().getMarkersList().remove(test);
             this.userMarker.setLatitude(location.getLatitude());
             this.userMarker.setLongitude(location.getLongitude());
             this.userMarker.updateMarker(location.getLatitude(), location.getLongitude());
+            Log.e(
+                    "DEBUGGG", "" + this.userMarker.getLatitude() + "-" + this.userMarker.getLongitude() + "AFTER" + this.mapsController
+                            .getMapsModel()
+                            .getMarkersList()
+                            .toString()
+            );
+            this.mapsController.getMapsModel()
+                    .getMarkersList()
+                    .put(this.userMarker.getLatitude() + "-" + this.userMarker.getLongitude(), this.userMarker);
         }
     }
 

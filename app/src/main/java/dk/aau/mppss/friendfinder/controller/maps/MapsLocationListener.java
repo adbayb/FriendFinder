@@ -24,30 +24,30 @@ public class MapsLocationListener implements GoogleMap.OnMyLocationChangeListene
         //only register as changed location if user location has changed more than 50 meters
         if(lastLocation == null) {
             this.onMapsLocationListener.getInitialLocation(location);
-            /*lastLocation = location;
-            Toast.makeText(
+            lastLocation = location;
+            /*Toast.makeText(
                     context, "INITIAL LOCATION SET TO LAST LOCATION:" + location.getLatitude() +
                             ": " + location.getLongitude() + ". ACCURACY: " + location.getAccuracy(), Toast.LENGTH_LONG
             ).show();*/
-        }
-
-        //We set precision to 3 meters even if it's not real:
-        if(lastLocation.distanceTo(location) > 3) {
-            lastLocation = currLocation;
-            currLocation = location;
-            this.onMapsLocationListener.onUpdatedLocation(location);
+        } else {
+            //We set precision to 3 meters even if it's not real:
+            if(lastLocation.distanceTo(location) > 3) {
+                lastLocation = currLocation;
+                currLocation = location;
+                this.onMapsLocationListener.onUpdatedLocation(location);
 
             /*Toast.makeText(
                     context, "NEW LOCATION REGISTERED: " + location.getLatitude() + " - " + location
                     .getLongitude(), Toast.LENGTH_LONG
             ).show();*/
-        } else {
-            //do nothing - not enough change in location to register!!!
+            } else {
+                //do nothing - not enough change in location to register!!!
             /*String dist = String.valueOf(lastLocation.distanceTo(location));
             Toast.makeText(
                     context, "DISTANCE" + dist + ". REGISTERED, BUT NOT NEW: " + location.getLatitude() + " - " + location
                     .getLongitude(), Toast.LENGTH_LONG
             ).show();*/
+            }
         }
     }
 }
