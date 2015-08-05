@@ -65,14 +65,16 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
             //We can edit only POI Markers and not a FB Friend marker (both we can show window info):
             POIMarkerModel poiMarkerModel = this.mapsController.findPOIMarkerModelFromList(marker);
             if(poiMarkerModel != null) {
-                Gui.replaceFragment(
-                        mapsController.getMapsChildFragmentManager(),
-                        R.id.fragment_container,
-                        EditMarkerFragment.Update(
-                                poiMarkerModel,
-                                marker
-                        )
-                );
+                //We can only modify our POIs not Friends POIs:
+                if(poiMarkerModel.isBelongsToUser()) {
+                    Gui.replaceFragment(
+                            mapsController.getMapsChildFragmentManager(),
+                            R.id.fragment_container,
+                            EditMarkerFragment.Update(
+                                    poiMarkerModel
+                            )
+                    );
+                }
             }
         }
         //Log.e("AYOUB onInfoWinClick", "Click");
@@ -87,7 +89,11 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
         MarkerModel markerModel = this.mapsController.findMarkerModelFromList(marker);
         title.setText(markerModel.getLabel());
         if(markerModel instanceof POIMarkerModel) {
-            //description.setText((POIMarkerModel)(markerModel).getDescription());
+            description.setText(((POIMarkerModel) markerModel).getDescription());
+            //Log.e("AYOUB INSTANCE OK", "POI");
+        } else {
+            description.setText("");
+            //Log.e("AYOUB INSTANCE OK", "FB");
         }
         //TODO gestion icon:
         //icon.setImageDrawable();

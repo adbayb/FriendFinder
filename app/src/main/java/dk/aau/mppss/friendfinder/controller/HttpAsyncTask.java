@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import dk.aau.mppss.friendfinder.UtilityClass;
-
 /**
  * Created by EDF-NOMEDE on 03/08/2015.
  */
@@ -103,7 +101,7 @@ public class HttpAsyncTask extends AsyncTask<String, String, String> {
             // create HttpClient
             HttpClient httpclient = new DefaultHttpClient();
             // make GET request to the given URL
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(UtilityClass.urlGetAllPOI));
+            HttpResponse httpResponse = httpclient.execute(new HttpGet(this.urlRequest));
             // receive response as inputStream
             inputStream = httpResponse.getEntity().getContent();
             // convert inputstream to string

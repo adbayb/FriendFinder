@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +12,11 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 
+import java.util.HashMap;
 import java.util.List;
 
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.UtilityClass;
 import dk.aau.mppss.friendfinder.controller.HttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.maps.MapsController;
 import dk.aau.mppss.friendfinder.controller.maps.MapsFBHttpAsyncTask;
@@ -65,21 +66,37 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
         if(this.mapsController != null) {
             this.mapsController.initializeMaps();
 
-            HttpAsyncTask poiHttpAsyncTask = new HttpAsyncTask(
-                    new MapsPOIHttpAsyncTask(this.mapsController),
-                    "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php"
+            HttpAsyncTask poiUserHttpAsyncTask = new HttpAsyncTask(
+                    new MapsPOIHttpAsyncTask(this.mapsController, R.drawable.user_poi, true),
+                    UtilityClass.urlGetAllUserPOI,
+                    new HashMap<String, Object>() {{
+                        put("idFacebook", UtilityClass.getUserID());
+                    }}
             );
-            poiHttpAsyncTask.execute();
+            poiUserHttpAsyncTask.execute();
 
-            //TODO Sekou modifier URL php WS:
+            HttpAsyncTask poiFriendsHttpAsyncTask = new HttpAsyncTask(
+                    new MapsPOIHttpAsyncTask(this.mapsController, R.drawable.friend_poi, false),
+                    UtilityClass.urlGetAllFriendsPOI,
+                    new HashMap<String, Object>() {{
+                        put("idFacebook", UtilityClass.getUserID());
+                    }}
+            );
+            poiFriendsHttpAsyncTask.execute();
+
             HttpAsyncTask fbHttpAsyncTask = new HttpAsyncTask(
-                    new MapsFBHttpAsyncTask(this.mapsController),
-                    "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php"
+                    new MapsFBHttpAsyncTask(this.mapsController, R.drawable.friend),
+                    UtilityClass.urlGetFriendsFB,
+                    new HashMap<String, Object>() {{
+                        put("idUser", UtilityClass.getUserID());
+                    }}
             );
             fbHttpAsyncTask.execute();
 
-            //TODO retrieve informations from DB see with Sekou:
-            this.userMarker = this.mapsController.setUserMarker(new FBMarkerModel("AYOUBBBB", "MyMarker", 1.2, 3.4, null));
+            this.userMarker = this.mapsController.setUserMarker(
+                    new FBMarkerModel(UtilityClass.getUserName(), null, 1.2, 3.4, null),
+                    R.drawable.user
+            );
             //Log.e("AYOUB", "onActivityCreated ");
         }
     }
@@ -168,32 +185,8 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
 
     @Override
     public void getInitialLocation(Location location) {
-        //Log.e("AAAAAAA", "initial Localisation" + location.getLatitude() + "-" + location.getLongitude());
         //Set User Marker:
-        if(this.userMarker != null) {
-            FBMarkerModel test = (FBMarkerModel) this.mapsController.getMapsModel()
-                    .getMarkersList()
-                    .get(this.userMarker.getLatitude() + "-" + this.userMarker.getLongitude());
-            Log.e(
-                    "DEBUGGG", "" + test + "BEFORE" + this.mapsController.getMapsModel()
-                            .getMarkersList()
-                            .toString()
-            );
-            if(test != null)
-                this.mapsController.getMapsModel().getMarkersList().remove(test);
-            this.userMarker.setLatitude(location.getLatitude());
-            this.userMarker.setLongitude(location.getLongitude());
-            this.userMarker.updateMarker(location.getLatitude(), location.getLongitude());
-            Log.e(
-                    "DEBUGGG", "" + this.userMarker.getLatitude() + "-" + this.userMarker.getLongitude() + "AFTER" + this.mapsController
-                            .getMapsModel()
-                            .getMarkersList()
-                            .toString()
-            );
-            this.mapsController.getMapsModel()
-                    .getMarkersList()
-                    .put(this.userMarker.getLatitude() + "-" + this.userMarker.getLongitude(), this.userMarker);
-        }
+        this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
     }
 
     @Override
@@ -204,12 +197,8 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
                 "FriendFinder Notification: Updated Location",
                 "New Location more than 3 meters from previous one"
         );
-        //Log.e("AAAAAAA2", "updated Localisation"+location.getLatitude()+"-"+location.getLongitude());
+        //Log.e("Ayoub", "updated Localisation"+location.getLatitude()+"-"+location.getLongitude());
         //Update User Marker Location:
-        if(this.userMarker != null) {
-            this.userMarker.setLatitude(location.getLatitude());
-            this.userMarker.setLongitude(location.getLongitude());
-            this.userMarker.updateMarker(location.getLatitude(), location.getLongitude());
-        }
+        this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
     }
 }

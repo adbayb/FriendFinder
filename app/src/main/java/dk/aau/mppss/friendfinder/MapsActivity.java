@@ -1,10 +1,10 @@
 package dk.aau.mppss.friendfinder;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,11 +50,16 @@ public class MapsActivity extends AppCompatActivity {
         Bundle fromFBActivity = getIntent().getExtras();
         if(fromFBActivity != null) {
             //UtilityClass.setUserID(fromFBActivity.getString("userFBId"));
-            UtilityClass.setFriendsUserID(fromFBActivity.getStringArrayList("friendsFBId"));
+            /*
+            //With SharedPreferences:
             SharedPreferences userSettings = getSharedPreferences(".userSettingsFile", this.MODE_PRIVATE);
             UtilityClass.setUserID(userSettings.getString("userId", null));
-            //Log.e("Bundle MainActivity", "" + UtilityClass.getFriendsUserID());
-            //Log.e("Bundle MainActivity(2)", UtilityClass.getUserID());
+            UtilityClass.setUserName(userSettings.getString("userName", null));
+            */
+            UtilityClass.setUserID(fromFBActivity.getString("userId"));
+            UtilityClass.setUserName(fromFBActivity.getString("userName"));
+            Log.e("Bundle MainActivity", "" + UtilityClass.getUserName());
+            Log.e("Bundle MainActivity(2)", UtilityClass.getUserID());
         }
 
         this.mapsFragment = new MapsFragment();

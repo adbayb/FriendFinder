@@ -1,9 +1,7 @@
 package dk.aau.mppss.friendfinder.controller.facebook;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -26,7 +24,6 @@ import dk.aau.mppss.friendfinder.model.facebook.User;
  * Created by adibayoub on 30/07/2015.
  */
 public class FacebookController {
-    //private List<Friend> friendsList;
     private List<String> friendsIDList;
     private User user;
 
@@ -36,18 +33,13 @@ public class FacebookController {
     }
 
     public void getResultRequest(AppCompatActivity _context) {
+        this.friendsRequest(_context);
         this.meRequest(_context);
-        try {
-            this.friendsRequest(_context);
-        }
-        catch(InterruptedException e) {
-            e.printStackTrace();
-        }
 
         return;
     }
 
-    public boolean friendsRequest(AppCompatActivity _context) throws InterruptedException {
+    public boolean friendsRequest(AppCompatActivity _context) {
         //Log.e("Token out", "" + AccessToken.getCurrentAccessToken().getToken());
         final AppCompatActivity context = _context;
         if(context != null) {
@@ -67,17 +59,6 @@ public class FacebookController {
                                     e.printStackTrace();
                                 }
                             }
-
-                            //We must switch activities only after completed FB Request:
-                            Intent switchMapActivity = new Intent(context, MapsActivity.class);
-
-                            /*switchMapActivity.putExtra(
-                                    "userFBId", user.getId().toString()
-                            );*/
-                            switchMapActivity.putStringArrayListExtra("friendsFBId", (ArrayList<String>) friendsIDList);
-                            Log.e("Avant MainActivity", "" + (ArrayList<String>) friendsIDList);
-                            context.startActivity(switchMapActivity);
-
                             return;
                         }
                     }
@@ -103,12 +84,21 @@ public class FacebookController {
                                     jsonKeyValue.get("id").toString(), jsonKeyValue.get("name")
                                     .toString(), null, null
                             );
-                            //We save user Id inside shared Preferences file:
+
                             if(user != null) {
+                                /*
+                                //We save user Id inside shared Preferences file:
                                 SharedPreferences userSettings = context.getSharedPreferences(".userSettingsFile", context.MODE_PRIVATE);
                                 SharedPreferences.Editor sharedPrefEditor = userSettings.edit();
                                 sharedPrefEditor.putString("userId", user.getId());
+                                sharedPrefEditor.putString("userName", user.getName());
                                 sharedPrefEditor.commit();
+                                */
+                                //We must switch activities only after completed FB Request:
+                                Intent switchMapActivity = new Intent(context, MapsActivity.class);
+                                switchMapActivity.putExtra("userId", user.getId());
+                                switchMapActivity.putExtra("userName", user.getName());
+                                context.startActivity(switchMapActivity);
                             }
                             //Log.e("Ayoub0", "Pass1" + user.toString());
                         }

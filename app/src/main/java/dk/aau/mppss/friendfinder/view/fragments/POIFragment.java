@@ -105,6 +105,7 @@ public class POIFragment extends Fragment {
         myList = (ListView) parentView.findViewById(R.id.fragment_poi_list_view);
 
         // call AsynTask to perform network operation on separate thread
+        //TODO
         new HttpAsyncTask().execute("http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php");
 
         return parentView;

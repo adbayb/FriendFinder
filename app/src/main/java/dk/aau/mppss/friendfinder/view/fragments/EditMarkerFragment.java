@@ -25,7 +25,6 @@ import dk.aau.mppss.friendfinder.view.Gui;
  */
 public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
     private static POIMarkerModel poiMarkerModel;
-    private static Marker marker;
     private Button saveButton;
     private Button deleteButton;
     //Fragment attributes to edit:
@@ -35,18 +34,20 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
 
     //We cannot instantiate from a fragment with public EditMarkerFragment() and parameters,
     //we must save parameters on bundle on "custom" constructor:
-    public static EditMarkerFragment Update(POIMarkerModel _poiMarkerModel, Marker _marker) {
+    public static EditMarkerFragment Update(POIMarkerModel _poiMarkerModel) {
         EditMarkerFragment editMarkerFragment = new EditMarkerFragment();
         //Ne pas vérifier si _poiMarkerModel est null avant de l'affecter car poiMarkerModel est une
         //valeur statique et on doit l'overwritter à chaque appel de notre appel statique à Create:
         poiMarkerModel = _poiMarkerModel;
-        if(_marker != null) {
-            marker = _marker;
+        if(poiMarkerModel != null) {
+            Marker marker = poiMarkerModel.getMarker();
+            if(marker != null) {
 
-            Bundle bundle = new Bundle();
-            bundle.putDouble("poi_latitude", marker.getPosition().latitude);
-            bundle.putDouble("poi_longitude", marker.getPosition().longitude);
-            editMarkerFragment.setArguments(bundle);
+                Bundle bundle = new Bundle();
+                bundle.putDouble("poi_latitude", marker.getPosition().latitude);
+                bundle.putDouble("poi_longitude", marker.getPosition().longitude);
+                editMarkerFragment.setArguments(bundle);
+            }
         }
 
         return editMarkerFragment;
@@ -55,7 +56,6 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
     public static EditMarkerFragment Create(LatLng latLng) {
         EditMarkerFragment editMarkerFragment = new EditMarkerFragment();
         poiMarkerModel = null;
-        marker = null;
         Bundle args = new Bundle();
         if(latLng != null) {
             args.putDouble("poi_latitude", latLng.latitude);
@@ -105,14 +105,16 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
     public void onResume() {
         super.onResume();
         this.onSaveListener(this.saveButton);
+        this.onDeleteListener(this.deleteButton);
     }
 
-    public void onSaveListener(Button saveButton) {
-        if(saveButton != null) {
-            saveButton.setOnClickListener(
+    public void onDeleteListener(Button deleteButton) {
+        if(this.deleteButton != null) {
+            this.deleteButton.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            /*
                             POIMarkerModel poiMarker;
                             //si null, on est en mode création d'un poi sinon update:
                             if(poiMarkerModel == null)
@@ -130,6 +132,42 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
                                 //Nous enlevons l'éditeur et on remet le listener d'ajout POI en place:
                                 hideEditor(parentFragment);
                             }
+                            */
+                            //Log.e("EditMarker AYOUB", "CLICK DELETE");
+                            if(deletePOIMarker() != null) {
+                                MapsFragment parentFragment = (MapsFragment) getParentFragment();
+                                hideEditor(parentFragment);
+                            }
+                        }
+                    }
+            );
+        }
+    }
+
+    public void onSaveListener(Button saveButton) {
+        if(this.saveButton != null) {
+            this.saveButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            POIMarkerModel poiMarker;
+                            //si null, on est en mode création d'un poi sinon update:
+                            if(poiMarkerModel == null)
+                                poiMarker = createPOIMarker();
+                            else {
+                                poiMarker = updatePOIMarker();
+                            }
+
+                            //We get parent fragment since EditMarkerFragment will be
+                            //added inside a fragment and not like a root fragment. For example inside
+                            //MapsFragment via getChildFragmentManager
+                            MapsFragment parentFragment = (MapsFragment) getParentFragment();
+                            if(parentFragment != null) {
+                                parentFragment.getMapsController()
+                                        .addPOIMarker(poiMarker, R.drawable.user_poi);
+                                //Nous enlevons l'éditeur et on remet le listener d'ajout POI en place:
+                                hideEditor(parentFragment);
+                            }
 
                         }
                     }
@@ -137,11 +175,31 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         }
     }
 
-    public void httpOnCreatePOI(String url) {
+    public void onHttpDeletePOI() {
         try {
             HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
                     EditMarkerFragment.this,
-                    url,
+                    UtilityClass.urlDeletePOI,
+                    new HashMap<String, Object>() {{
+                        put("userId", UtilityClass.getUserID());
+                        put("latitude", new Double(latLng.latitude).toString());
+                        put("longitude", new Double(latLng.longitude).toString());
+                    }}
+            );
+            httpAsyncTask.execute();
+        }
+        catch(Exception e) {
+            //Log.e("Fail", e.toString());
+        }
+
+        return;
+    }
+
+    public void onHttpCreatePOI() {
+        try {
+            HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
+                    EditMarkerFragment.this,
+                    UtilityClass.urlCreatePOI,
                     new HashMap<String, Object>() {{
                         put("userId", UtilityClass.getUserID());
                         put("title", nameTextView.getText().toString());
@@ -159,11 +217,11 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         return;
     }
 
-    public void httpOnUpdatePOI(String url) {
+    public void onHttpUpdatePOI() {
         try {
             HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
                     EditMarkerFragment.this,
-                    url,
+                    UtilityClass.urlUpdatePOI,
                     new HashMap<String, Object>() {{
                         put("userId", UtilityClass.getUserID());
                         put("title", nameTextView.getText().toString());
@@ -181,23 +239,24 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         return;
     }
 
-    public POIMarkerModel createPOIMarker(String urlRequest) {
-        this.httpOnCreatePOI(urlRequest);
+    public POIMarkerModel createPOIMarker() {
+        this.onHttpCreatePOI();
 
         poiMarkerModel = new POIMarkerModel(
                 nameTextView.getText().toString(),
                 descriptionTextView.getText().toString(),
                 latLng.latitude,
                 latLng.longitude,
-                null
+                null,
+                true
         );
 
         return poiMarkerModel;
     }
 
-    public POIMarkerModel updatePOIMarker(String urlRequest) {
+    public POIMarkerModel updatePOIMarker() {
         if(poiMarkerModel != null) {
-            this.httpOnUpdatePOI(urlRequest);
+            this.onHttpUpdatePOI();
 
             poiMarkerModel.setLabel(nameTextView.getText().toString());
             poiMarkerModel.setDescription(
@@ -205,8 +264,21 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
                             .toString()
             );
             //We remove the old marker:
-            if(marker != null)
-                marker.remove();
+            if(poiMarkerModel.getMarker() != null)
+                poiMarkerModel.getMarker().remove();
+
+            return poiMarkerModel;
+        }
+        return null;
+    }
+
+    public POIMarkerModel deletePOIMarker() {
+        if(poiMarkerModel != null) {
+            this.onHttpDeletePOI();
+
+            //We remove the old marker:
+            if(poiMarkerModel != null)
+                poiMarkerModel.getMarker().remove();
 
             return poiMarkerModel;
         }

@@ -4,7 +4,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,11 +13,13 @@ public final class UtilityClass {
     public static final String urlCreatePOI = "http://friendfinder.alwaysdata.net/FriendFinder/create_poi.php";
     public static final String urlUpdatePOI = "http://friendfinder.alwaysdata.net/FriendFinder/update_poi.php";
     public static final String urlDeletePOI = "http://friendfinder.alwaysdata.net/FriendFinder/delete_poi.php";
-    public static final String urlGetAllPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php";
+    public static final String urlGetAllUserPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_my_poi.php";
     public static final String urlGetFriendsFB = "http://friendfinder.alwaysdata.net/FriendFinder/list_users.php";
+    public static final String urlGetAllFriendsPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_friends_poi.php";
+
     //Utility Constants:
     private static String userID;
-    private static List<String> friendsUserID;
+    private static String userName;
 
     private UtilityClass() {
 
@@ -63,11 +64,11 @@ public final class UtilityClass {
         UtilityClass.userID = userID;
     }
 
-    public static List<String> getFriendsUserID() {
-        return friendsUserID;
+    public static String getUserName() {
+        return userName;
     }
 
-    public static void setFriendsUserID(List<String> friendsUserID) {
-        UtilityClass.friendsUserID = friendsUserID;
+    public static void setUserName(String userName) {
+        UtilityClass.userName = userName;
     }
 }

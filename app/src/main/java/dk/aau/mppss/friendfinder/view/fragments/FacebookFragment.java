@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import dk.aau.mppss.friendfinder.R;
@@ -50,20 +49,12 @@ public class FacebookFragment extends Fragment implements OnHttpAsyncTask {
 
     public void httpOnSelectFriend(String url) {
         try {
-            String requestIDFriends = "";
-            Iterator<String> iterator = UtilityClass.getFriendsUserID().iterator();
-            while(iterator.hasNext()) {
-                requestIDFriends += "'" + iterator.next() + "'";
-                if(iterator.hasNext())
-                    requestIDFriends += ",";
-            }
-            final String requestIDs = requestIDFriends;
             //Log.e("Ayoubbbbb",requestIDFriends);
             HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
                     FacebookFragment.this,
                     url,
                     new HashMap<String, Object>() {{
-                        put("friendId", requestIDs);
+                        put("idUser", UtilityClass.getUserID());
                     }}
             );
             httpAsyncTask.execute();

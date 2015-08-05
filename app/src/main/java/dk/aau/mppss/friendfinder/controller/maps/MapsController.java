@@ -105,24 +105,68 @@ public class MapsController {
 
     }
 
-    public POIMarkerModel addPOIMarker(POIMarkerModel poiMarkerModel) {
-        POIMarkerModel markerModel = (POIMarkerModel) this.maps.addMarker(poiMarkerModel, R.drawable.poi);
+    public POIMarkerModel addPOIMarker(POIMarkerModel poiMarkerModel, int idRessourceIcon) {
+        POIMarkerModel markerModel = (POIMarkerModel) this.maps.addMarker(poiMarkerModel, idRessourceIcon);
         //Log.e("Avant", poiMarkerModel.toString());
         //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
 
         return markerModel;
     }
 
-    public FBMarkerModel addFBMarker(FBMarkerModel fbMarkerModel) {
-        FBMarkerModel markerModel = (FBMarkerModel) this.maps.addMarker(fbMarkerModel, R.drawable.user);
+    public POIMarkerModel updatePOIMarker(POIMarkerModel poiMarkerModel, double latitude, double longitude) {
+        if(poiMarkerModel != null) {
+            POIMarkerModel oldPOIMarkerModel = (POIMarkerModel) this.getMapsModel()
+                    .findMarkerModelFromPosition(new LatLng(latitude, longitude));
+
+            //Remove old MarkerModel from Map List:
+            if(oldPOIMarkerModel != null)
+                this.getMapsModel().getMarkersList().remove(oldPOIMarkerModel);
+
+            //Update Marker Model + marker position attached to it:
+            poiMarkerModel.setLatitude(latitude);
+            poiMarkerModel.setLongitude(longitude);
+            poiMarkerModel.updateMarker(latitude, longitude);
+
+            //Add the new updated MarkerModel inside Map List:
+            return (POIMarkerModel) this.getMapsModel()
+                    .getMarkersList()
+                    .put(latitude + "-" + longitude, (POIMarkerModel) poiMarkerModel);
+        }
+        return null;
+    }
+
+    public FBMarkerModel addFBMarker(FBMarkerModel fbMarkerModel, int idRessourceIcon) {
+        FBMarkerModel markerModel = (FBMarkerModel) this.maps.addMarker(fbMarkerModel, idRessourceIcon);
         //Log.e("Avant", poiMarkerModel.toString());
         //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
 
         return markerModel;
     }
 
-    public FBMarkerModel setUserMarker(FBMarkerModel fbMarkerModel) {
-        return this.addFBMarker(fbMarkerModel);
+    public FBMarkerModel updateFBMarker(FBMarkerModel fbMarkerModel, double latitude, double longitude) {
+        if(fbMarkerModel != null) {
+            FBMarkerModel oldFBMarkerModel = (FBMarkerModel) this.getMapsModel()
+                    .findMarkerModelFromPosition(new LatLng(latitude, longitude));
+
+            //Remove old MarkerModel from Map List:
+            if(oldFBMarkerModel != null)
+                this.getMapsModel().getMarkersList().remove(oldFBMarkerModel);
+
+            //Update Marker Model + marker position attached to it:
+            fbMarkerModel.setLatitude(latitude);
+            fbMarkerModel.setLongitude(longitude);
+            fbMarkerModel.updateMarker(latitude, longitude);
+
+            //Add the new updated MarkerModel inside Map List:
+            return (FBMarkerModel) this.getMapsModel()
+                    .getMarkersList()
+                    .put(latitude + "-" + longitude, (FBMarkerModel) fbMarkerModel);
+        }
+        return null;
+    }
+
+    public FBMarkerModel setUserMarker(FBMarkerModel fbMarkerModel, int idRessourceIcon) {
+        return this.addFBMarker(fbMarkerModel, idRessourceIcon);
     }
 
     /*
@@ -186,9 +230,7 @@ public class MapsController {
     public POIMarkerModel findPOIMarkerModelFromList(Marker marker) {
         MarkerModel markerModel = this.maps.findMarkerModelFromMarker(marker);
         if(markerModel != null) {
-            Log.e("DEBUG33333", "PASS NOT NULL");
             if(markerModel instanceof POIMarkerModel) {
-                Log.e("DEBUG33333", "PASS INSTANCE");
                 return (POIMarkerModel) markerModel;
             }
         }

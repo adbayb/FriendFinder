@@ -1,7 +1,5 @@
 package dk.aau.mppss.friendfinder.model.maps;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -91,11 +89,9 @@ public class MapsModel {
 
     //Optimisation recherche marker spécifique dans Map via une clé unique définit par latitude et longitude:
     public MarkerModel findMarkerModelFromMarker(Marker marker) {
-        Log.e("DEBUG33333", "PASSSSS");
         //Research with key:
         if(marker != null) {
             String searchKey = marker.getPosition().latitude + "-" + marker.getPosition().longitude;
-            Log.e("DEBUG33333", searchKey);
             //returns null if not found:
             return this.markersList.get(searchKey);
         }

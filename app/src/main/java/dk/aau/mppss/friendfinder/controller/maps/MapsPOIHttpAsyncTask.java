@@ -1,7 +1,5 @@
 package dk.aau.mppss.friendfinder.controller.maps;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,9 +15,13 @@ import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
  */
 public class MapsPOIHttpAsyncTask implements OnHttpAsyncTask {
     private MapsController mapsController;
+    private int idIcon;
+    private boolean isUserPOI;
 
-    public MapsPOIHttpAsyncTask(MapsController mapsController) {
+    public MapsPOIHttpAsyncTask(MapsController mapsController, int idRessourceIcon, boolean isUserPOI) {
         this.mapsController = mapsController;
+        this.idIcon = idRessourceIcon;
+        this.isUserPOI = isUserPOI;
     }
 
     @Override
@@ -47,19 +49,45 @@ public class MapsPOIHttpAsyncTask implements OnHttpAsyncTask {
                                                         poiSQLList.get("longitude")
                                                                 .toString()
                                                 ),
-                                                null
-                                        )
+                                                null,
+                                                isUserPOI
+                                        ),
+                                        idIcon
                                 );
                             }
                         }
                     }
-                    Log.e("AYOUB List POI", this.mapsController.getPOIList().toString());
-                    Log.e("AYOUB List FBBBB", this.mapsController.getFBList().toString());
+                    //Log.e("AYOUB List POI", this.mapsController.getPOIList().toString());
+                    //Log.e("AYOUB List FBBBB", this.mapsController.getFBList().toString());
                 }
             }
         }
         catch(JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public MapsController getMapsController() {
+        return mapsController;
+    }
+
+    public void setMapsController(MapsController mapsController) {
+        this.mapsController = mapsController;
+    }
+
+    public int getIdIcon() {
+        return idIcon;
+    }
+
+    public void setIdIcon(int idIcon) {
+        this.idIcon = idIcon;
+    }
+
+    public boolean isUserPOI() {
+        return isUserPOI;
+    }
+
+    public void setIsUserPOI(boolean isUserPOI) {
+        this.isUserPOI = isUserPOI;
     }
 }
