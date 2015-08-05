@@ -1,11 +1,13 @@
 package dk.aau.mppss.friendfinder.controller.facebook;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 
 import org.json.JSONArray;
@@ -18,76 +20,105 @@ import java.util.Map;
 
 import dk.aau.mppss.friendfinder.MapsActivity;
 import dk.aau.mppss.friendfinder.UtilityClass;
-import dk.aau.mppss.friendfinder.model.facebook.Friend;
 import dk.aau.mppss.friendfinder.model.facebook.User;
 
 /**
  * Created by adibayoub on 30/07/2015.
  */
 public class FacebookController {
-    private List<Friend> friendsList;
+    //private List<Friend> friendsList;
+    private List<String> friendsIDList;
     private User user;
 
     public FacebookController() {
-        this.friendsList = new ArrayList<Friend>();
+        this.friendsIDList = new ArrayList<String>();
         this.user = null;
     }
 
-    public void getResultRequest(AppCompatActivity context) {
-        this.friendsRequest(context);
-        this.meRequest(context);
+    public void getResultRequest(AppCompatActivity _context) {
+        this.meRequest(_context);
+        try {
+            this.friendsRequest(_context);
+        }
+        catch(InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return;
     }
 
-    public void friendsRequest(AppCompatActivity context) {
+    public boolean friendsRequest(AppCompatActivity _context) throws InterruptedException {
         //Log.e("Token out", "" + AccessToken.getCurrentAccessToken().getToken());
-        GraphRequest.newMyFriendsRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONArrayCallback() {
-                    @Override
-                    public void onCompleted(JSONArray jsonArray, GraphResponse graphResponse) {
-                        for(int index = 0; index < jsonArray.length(); index++) {
-                            try {
-                                Map<String, Object> jsonMapObject = UtilityClass.parseJSONObject(
-                                        jsonArray.getJSONObject(index)
-                                );
-                                populateFriendsList(jsonMapObject);
+        final AppCompatActivity context = _context;
+        if(context != null) {
+            GraphRequestAsyncTask test = GraphRequest.newMyFriendsRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    new GraphRequest.GraphJSONArrayCallback() {
+                        @Override
+                        public void onCompleted(JSONArray jsonArray, GraphResponse graphResponse) {
+                            for(int index = 0; index < jsonArray.length(); index++) {
+                                try {
+                                    Map<String, Object> jsonMapObject = UtilityClass.parseJSONObject(
+                                            jsonArray.getJSONObject(index)
+                                    );
+                                    populateFriendsList(jsonMapObject);
+                                }
+                                catch(JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                            catch(JSONException e) {
-                                e.printStackTrace();
-                            }
+
+                            //We must switch activities only after completed FB Request:
+                            Intent switchMapActivity = new Intent(context, MapsActivity.class);
+
+                            /*switchMapActivity.putExtra(
+                                    "userFBId", user.getId().toString()
+                            );*/
+                            switchMapActivity.putStringArrayListExtra("friendsFBId", (ArrayList<String>) friendsIDList);
+                            Log.e("Avant MainActivity", "" + (ArrayList<String>) friendsIDList);
+                            context.startActivity(switchMapActivity);
+
+                            return;
                         }
                     }
-                }
-        ).executeAsync();
+            ).executeAsync();
 
-        return;
+            return true;
+        }
+
+        return false;
     }
 
-    public void meRequest(AppCompatActivity context) {
-        final AppCompatActivity activity = context;
-        GraphRequest.newMeRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
-                        Map<String, Object> jsonKeyValue = UtilityClass.parseJSONObject(jsonObject);
-                        user = new User(
-                                jsonKeyValue.get("id").toString(), jsonKeyValue.get("name")
-                                .toString(), null, null
-                        );
-                        //We must switch activities only after completed FB Request:
-                        Intent switchMapActivity = new Intent(activity, MapsActivity.class);
-                        switchMapActivity.putExtra(
-                                "userFBId", user.getId().toString()
-                        );
-                        activity.startActivity(switchMapActivity);
+    public boolean meRequest(AppCompatActivity _context) {
+        final AppCompatActivity context = _context;
+        if(context != null) {
+            GraphRequest.newMeRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
+                            //Log.e("Ayoub0", "Pass0" + user.toString());
+                            Map<String, Object> jsonKeyValue = UtilityClass.parseJSONObject(jsonObject);
+                            user = new User(
+                                    jsonKeyValue.get("id").toString(), jsonKeyValue.get("name")
+                                    .toString(), null, null
+                            );
+                            //We save user Id inside shared Preferences file:
+                            if(user != null) {
+                                SharedPreferences userSettings = context.getSharedPreferences(".userSettingsFile", context.MODE_PRIVATE);
+                                SharedPreferences.Editor sharedPrefEditor = userSettings.edit();
+                                sharedPrefEditor.putString("userId", user.getId());
+                                sharedPrefEditor.commit();
+                            }
+                            //Log.e("Ayoub0", "Pass1" + user.toString());
+                        }
                     }
-                }
-        ).executeAsync();
+            ).executeAsync();
 
-        return;
+            return true;
+        }
+
+        return false;
     }
 
     //Private functions: utility class functions:
@@ -104,28 +135,15 @@ public class FacebookController {
                 //and so on...
             }
             */
-            friendsList.add(
-                    new Friend(
-                            jsonKeyValue.get("id").toString(),
-                            jsonKeyValue.get("name").toString(),
-                            null,
-                            null
-                    )
+            this.friendsIDList.add(
+                    jsonKeyValue.get("id").toString()
             );
-            Log.e("Ayoub", friendsList.toString());
+            //Log.e("Ayoub", this.friendsIDList.toString());
 
             return true;
         }
 
         return false;
-    }
-
-    public List<Friend> getFriendsList() {
-        return friendsList;
-    }
-
-    public void setFriendsList(List<Friend> friendsList) {
-        this.friendsList = friendsList;
     }
 
     public User getUser() {
@@ -134,5 +152,13 @@ public class FacebookController {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<String> getFriendsIDList() {
+        return friendsIDList;
+    }
+
+    public void setFriendsIDList(List<String> friendsIDList) {
+        this.friendsIDList = friendsIDList;
     }
 }

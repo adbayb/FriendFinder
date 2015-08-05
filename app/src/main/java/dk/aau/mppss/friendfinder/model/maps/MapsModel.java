@@ -36,7 +36,9 @@ public class MapsModel {
 
             MarkerOptions markerOptions = new MarkerOptions().position(
                     new LatLng(markerModel.getLatitude(), markerModel.getLongitude())
-            ).title(markerModel.getLabel()).icon(BitmapDescriptorFactory.fromResource(idIconImage));
+            )
+                    .title(markerModel.getLabel())
+                    .icon(BitmapDescriptorFactory.fromResource(idIconImage));
             //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
             //.icon(BitmapDescriptorFactory.fromResource(R.drawable.arrow))
 

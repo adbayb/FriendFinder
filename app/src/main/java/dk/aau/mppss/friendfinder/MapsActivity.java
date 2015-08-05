@@ -1,5 +1,6 @@
 package dk.aau.mppss.friendfinder;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -20,14 +21,26 @@ Since Android support Library, we need to extends AppCompatActivity instead of A
 public class MapsActivity extends AppCompatActivity {
 
     @Override
+    public void onBackPressed() {
+        //this.getSupportFragmentManager().
+        //super.onBackPressed();
+        //Log.e("AYOUBBBBBBBBB", ""+this.getSupportFragmentManager().getFragments().get(0).getChildFragmentManager().getFragments());
+        return;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
         Bundle fromFBActivity = getIntent().getExtras();
         if(fromFBActivity != null) {
-            UtilityClass.setUserID(fromFBActivity.getString("userFBId"));
-            //Log.e("AYOUBBBBBBBBBBBBBBBB", UtilityClass.getUserID());
+            //UtilityClass.setUserID(fromFBActivity.getString("userFBId"));
+            UtilityClass.setFriendsUserID(fromFBActivity.getStringArrayList("friendsFBId"));
+            SharedPreferences userSettings = getSharedPreferences(".userSettingsFile", this.MODE_PRIVATE);
+            UtilityClass.setUserID(userSettings.getString("userId", null));
+            //Log.e("Bundle MainActivity", "" + UtilityClass.getFriendsUserID());
+            //Log.e("Bundle MainActivity(2)", UtilityClass.getUserID());
         }
 
         Gui.createGui(

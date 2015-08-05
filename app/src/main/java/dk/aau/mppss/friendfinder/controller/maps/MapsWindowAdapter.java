@@ -83,8 +83,9 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
         TextView description = (TextView) view.findViewById(R.id.window_adapter_description);
         ImageView icon = (ImageView) view.findViewById(R.id.window_adapter_icon);
 
-        title.setText(marker.getTitle());
-        description.setText("Description test " + marker.getId());
+        POIMarkerModel poiMarkerModel = this.mapsController.findPOIMarkerModelFromList(marker);
+        title.setText(poiMarkerModel.getLabel());
+        description.setText(poiMarkerModel.getDescription());
         //TODO gestion icon:
         //icon.setImageDrawable();
     }

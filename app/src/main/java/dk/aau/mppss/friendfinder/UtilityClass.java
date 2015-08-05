@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,6 +17,7 @@ public final class UtilityClass {
     public static final String urlGetAllPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php";
     //Utility Constants:
     private static String userID;
+    private static List<String> friendsUserID;
 
     private UtilityClass() {
 
@@ -58,5 +60,13 @@ public final class UtilityClass {
 
     public static void setUserID(String userID) {
         UtilityClass.userID = userID;
+    }
+
+    public static List<String> getFriendsUserID() {
+        return friendsUserID;
+    }
+
+    public static void setFriendsUserID(List<String> friendsUserID) {
+        UtilityClass.friendsUserID = friendsUserID;
     }
 }

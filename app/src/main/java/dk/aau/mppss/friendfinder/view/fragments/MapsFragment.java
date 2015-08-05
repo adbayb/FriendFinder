@@ -86,7 +86,7 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask {
             this.mapsController.addPOIListener();
             //this.mapsController.removePOIListener();
         }
-        Log.e("AYOUB", "onResume ");
+        //Log.e("AYOUB", "onResume ");
     }
 
     @Override
@@ -94,7 +94,7 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask {
         super.onPause();
         this.mapsController.stopAddPOIListener();
         this.mapsController.disableWindowAdapter();
-        Log.e("AYOUB", "onPause ");
+        //Log.e("AYOUB", "onPause ");
     }
 
     @Override
