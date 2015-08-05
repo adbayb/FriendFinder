@@ -3,6 +3,7 @@ package dk.aau.mppss.friendfinder;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -19,12 +20,25 @@ to have controls on ActionBar and FragmentActivity
 Since Android support Library, we need to extends AppCompatActivity instead of ActionBarActivity (deprecated)
  */
 public class MapsActivity extends AppCompatActivity {
+    private MapsFragment mapsFragment;
+    private POIFragment poiFragment;
+    private FacebookFragment facebookFragment;
+    private ViewPager viewPager;
 
     @Override
     public void onBackPressed() {
-        //this.getSupportFragmentManager().
-        //super.onBackPressed();
-        //Log.e("AYOUBBBBBBBBB", ""+this.getSupportFragmentManager().getFragments().get(0).getChildFragmentManager().getFragments());
+        if(this.viewPager != null) {
+            //We only test if EditMarkerFragment is visible inside the first tab (ie 0 that contains MapsFragment):
+            if(this.viewPager.getCurrentItem() == 0) {
+                //We only allow back pressed when EditMarker Fragment is displayed:
+                /*if(this.mapsFragment.isVisibleEditMarkerFragment() == true) {
+                    super.onBackPressed();
+                }*/
+                //We override BackPressed capabilities when an EditMarkerFragment is displayed by hiding the editor UI:
+                this.mapsFragment.popEditMarkerFragment();
+            }
+        }
+        //else no BackPressed allowed to avoid back to FB login:
         return;
     }
 
@@ -43,10 +57,14 @@ public class MapsActivity extends AppCompatActivity {
             //Log.e("Bundle MainActivity(2)", UtilityClass.getUserID());
         }
 
-        Gui.createGui(
+        this.mapsFragment = new MapsFragment();
+        this.poiFragment = new POIFragment();
+        this.facebookFragment = new FacebookFragment();
+
+        this.viewPager = Gui.createGui(
                 this,
                 new ArrayList<String>(Arrays.asList("Maps View", "POI List", "FB List")),
-                new ArrayList<Fragment>(Arrays.asList(new MapsFragment(), new POIFragment(), new FacebookFragment())),
+                new ArrayList<Fragment>(Arrays.asList(this.mapsFragment, this.poiFragment, this.facebookFragment)),
                 2
         );
     }

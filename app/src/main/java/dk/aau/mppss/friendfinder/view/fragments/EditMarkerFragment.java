@@ -128,8 +128,7 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
                             if(parentFragment != null) {
                                 parentFragment.getMapsController().addPOIMarker(poiMarker);
                                 //Nous enlevons l'éditeur et on remet le listener d'ajout POI en place:
-                                hideEditor();
-                                parentFragment.onResume();
+                                hideEditor(parentFragment);
                             }
 
                         }
@@ -213,12 +212,15 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         return null;
     }
 
-    private void hideEditor() {
+    public void hideEditor(MapsFragment mapsFragment) {
         //parentFragment.onStop();
         //We remove editor poi fragment from stack:
         Gui.popFragment(
                 getParentFragment().getChildFragmentManager()
         );
+        this.saveButton.setOnClickListener(null);
+        this.deleteButton.setOnClickListener(null);
+        mapsFragment.onResume();
 
         return;
     }

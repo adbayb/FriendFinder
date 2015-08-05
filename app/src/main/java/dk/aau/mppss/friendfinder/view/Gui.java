@@ -25,7 +25,7 @@ public final class Gui {
 
     }
 
-    public static void createGui(AppCompatActivity context, List<String> tabNames, List<Fragment> tabFragments, int numberTabsToSave) {
+    public static ViewPager createGui(AppCompatActivity context, List<String> tabNames, List<Fragment> tabFragments, int numberTabsToSave) {
         ActionBar actionBar = Gui.initializeActionBar(context);
         ViewPager viewPager = Gui.initializeViewPager(context, R.id.activity_maps_view_pager, numberTabsToSave);
         if(viewPager != null) {
@@ -39,7 +39,9 @@ public final class Gui {
             if(actionBar != null) {
                 actionBar = Gui.addTabs(tabNames, tabListener, actionBar);
             }
+            return viewPager;
         }
+        return null;
     }
 
     public static ViewPager initializeViewPager(final AppCompatActivity context, int idViewPager, int numberTabToSave) {

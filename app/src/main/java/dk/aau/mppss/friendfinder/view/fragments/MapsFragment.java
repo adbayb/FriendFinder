@@ -3,6 +3,7 @@ package dk.aau.mppss.friendfinder.view.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,6 +114,31 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask {
     public void onLowMemory() {
         super.onLowMemory();
         //Log.e("AYOUB", "onLowMemory ");
+    }
+
+    public EditMarkerFragment isVisibleEditMarkerFragment() {
+        FragmentManager childFragmentManager = this.getChildFragmentManager();
+        if(childFragmentManager != null) {
+            for(Fragment fragment : childFragmentManager.getFragments()) {
+                if(fragment instanceof EditMarkerFragment) {
+                    return (EditMarkerFragment) fragment;
+                }
+            }
+        }
+        //return ((EditMarkerFragment)this.getChildFragmentManager().getFragments()).isVisible();
+        return null;
+    }
+
+    public boolean popEditMarkerFragment() {
+        EditMarkerFragment editMarkerFragment = this.isVisibleEditMarkerFragment();
+        if(editMarkerFragment != null) {
+            //since editMarkerFragment will be always at the top of fragment stack child of MapsFragment,
+            //we can simply popBackStack (ie last child fragment) by calling hideEdit function:
+            editMarkerFragment.hideEditor(this);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
