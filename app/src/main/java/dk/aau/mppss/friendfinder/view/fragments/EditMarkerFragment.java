@@ -218,6 +218,7 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         Gui.popFragment(
                 getParentFragment().getChildFragmentManager()
         );
+        //We stop button listener:
         this.saveButton.setOnClickListener(null);
         this.deleteButton.setOnClickListener(null);
         mapsFragment.onResume();

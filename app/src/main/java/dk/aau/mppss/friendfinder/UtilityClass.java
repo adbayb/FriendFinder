@@ -15,6 +15,7 @@ public final class UtilityClass {
     public static final String urlUpdatePOI = "http://friendfinder.alwaysdata.net/FriendFinder/update_poi.php";
     public static final String urlDeletePOI = "http://friendfinder.alwaysdata.net/FriendFinder/delete_poi.php";
     public static final String urlGetAllPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php";
+    public static final String urlGetFriendsFB = "http://friendfinder.alwaysdata.net/FriendFinder/list_users.php";
     //Utility Constants:
     private static String userID;
     private static List<String> friendsUserID;
