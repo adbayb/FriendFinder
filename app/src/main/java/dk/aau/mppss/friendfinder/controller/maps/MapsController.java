@@ -107,7 +107,7 @@ public class MapsController {
     public Marker addPOIMarker(POIMarkerModel poiMarkerModel) {
         Marker marker = this.maps.addMarker(poiMarkerModel, R.drawable.poi);
         //Log.e("Avant", poiMarkerModel.toString());
-        //Log.e("AprÃ¨s", "" + this.maps.findMarkerModelFromMarker(mark).toString());
+        //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
 
         return marker;
     }
@@ -115,13 +115,13 @@ public class MapsController {
     public Marker addFBMarker(FBMarkerModel fbMarkerModel) {
         Marker marker = this.maps.addMarker(fbMarkerModel, R.drawable.user);
         //Log.e("Avant", poiMarkerModel.toString());
-        //Log.e("AprÃ¨s", "" + this.maps.findMarkerModelFromMarker(mark).toString());
+        //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
 
         return marker;
     }
 
     /*
-    //Trop imprÃ©cis puisque nous ne rÃ©cupÃ©rons pas la position initiale avant drag & drop:
+    //Trop imprécis puisque nous ne récupérons pas la position initiale avant drag & drop:
     public void removePOIListener() {
         this.maps.getGoogleMap().setOnMarkerDragListener(
                 new GoogleMap.OnMarkerDragListener() {

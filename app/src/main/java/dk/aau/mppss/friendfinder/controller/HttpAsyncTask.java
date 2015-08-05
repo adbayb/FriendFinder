@@ -123,7 +123,7 @@ public class HttpAsyncTask extends AsyncTask<String, String, String> {
 
     private String inputStreamToString(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        //Pas besoin de new pour String: on peut faire des String littÃ©raux sans crÃ©er d'objet dans le heap:
+        //Pas besoin de new pour String: on peut faire des String littéraux sans créer d'objet dans le heap:
         String line = "";
         String result = "";
 
