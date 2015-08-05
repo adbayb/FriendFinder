@@ -31,7 +31,7 @@ public class MapsModel {
     }
 
     //addMarker only on map but not on the list:
-    public Marker addMapMarker(MarkerModel markerModel, int idIconImage) {
+    public MarkerModel addMapMarker(MarkerModel markerModel, int idIconImage) {
         if(markerModel != null) {
 
             MarkerOptions markerOptions = new MarkerOptions().position(
@@ -44,23 +44,26 @@ public class MapsModel {
 
             //addMarker returns a Marker from google maps api:
             Marker marker = this.googleMap.addMarker(markerOptions);
+            //We add Marker reference inside MarkerModel to be able to remove it easily after:
+            markerModel.setMarker(marker);
+            //Enable Drag & Drop on marker:
             marker.setDraggable(true);
 
-            return marker;
+            return markerModel;
         }
 
         return null;
     }
 
     //addMarker to map and list both:
-    public Marker addMarker(MarkerModel markerModel, int idIconImage) {
-        Marker marker = this.addMapMarker(markerModel, idIconImage);
-        if(marker != null) {
+    public MarkerModel addMarker(MarkerModel _markerModel, int idIconImage) {
+        MarkerModel markerModel = this.addMapMarker(_markerModel, idIconImage);
+        if(markerModel != null) {
             if(this.markersList != null) {
-                String key = marker.getPosition().latitude + "-" + marker.getPosition().longitude;
+                String key = markerModel.getLatitude() + "-" + markerModel.getLongitude();
                 this.markersList.put(key, markerModel);
 
-                return marker;
+                return markerModel;
             }
             return null;
         }

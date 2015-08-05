@@ -1,5 +1,6 @@
 package dk.aau.mppss.friendfinder.view.fragments;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,9 @@ import dk.aau.mppss.friendfinder.UtilityClass;
 import dk.aau.mppss.friendfinder.controller.HttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.OnHttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.maps.MapsController;
+import dk.aau.mppss.friendfinder.controller.maps.MapsLocationListener;
+import dk.aau.mppss.friendfinder.controller.maps.MapsNotificationController;
+import dk.aau.mppss.friendfinder.controller.maps.OnMapsLocationListener;
 import dk.aau.mppss.friendfinder.model.maps.FBMarkerModel;
 import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
 import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
@@ -31,9 +35,10 @@ import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
 /**
  * A fragment that launches other parts of the demo application.
  */
-public class MapsFragment extends Fragment implements OnHttpAsyncTask {
+public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLocationListener {
     private MapsController mapsController;
     private List<? extends MarkerModel> sqlMarkers;
+    private FBMarkerModel userMarker;
 
     @Nullable
     @Override
@@ -50,6 +55,10 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask {
             this.mapsController = new MapsController(this.getChildFragmentManager(), inflater, googleMap);
             //We set a defaut camera position with animation:
             this.mapsController.moveAnimatedCamera(58.0, 9.0, 4);
+
+            this.mapsController.getMapsModel()
+                    .getGoogleMap()
+                    .setOnMyLocationChangeListener(new MapsLocationListener(getActivity(), this));
         }
         //Log.e("AYOUB", "onCreateView ");
         return parentView;
@@ -68,7 +77,9 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask {
                 "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php"
         );
         httpAsyncTask.execute();
-        this.mapsController.addFBMarker(new FBMarkerModel("AYOUBBBB", null, 1.2, 3.4));
+
+        //TODO retrieve informations from DB see with Sekou:
+        this.userMarker = this.mapsController.setUserMarker(new FBMarkerModel("AYOUBBBB", "MyMarker", 1.2, 3.4, null));
         //Log.e("AYOUB", "onActivityCreated ");
     }
 
@@ -177,7 +188,8 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask {
                                             Double.parseDouble(
                                                     poiSQLList.get("longitude")
                                                             .toString()
-                                            )
+                                            ),
+                                            null
                                     )
                             );
                         }
@@ -189,6 +201,34 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask {
         }
         catch(JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void getInitialLocation(Location location) {
+        //Log.e("AAAAAAA", "initial Localisation" + location.getLatitude() + "-" + location.getLongitude());
+        //Set User Marker:
+        if(this.userMarker != null) {
+            this.userMarker.setLatitude(location.getLatitude());
+            this.userMarker.setLongitude(location.getLongitude());
+            this.userMarker.updateMarker(location.getLatitude(), location.getLongitude());
+        }
+    }
+
+    @Override
+    public void onUpdatedLocation(Location location) {
+        new MapsNotificationController(this.getActivity()).newNotification(
+                0,
+                R.drawable.user,
+                "FriendFinder Notification: Updated Location",
+                "New Location more than 3 meters from previous one"
+        );
+        //Log.e("AAAAAAA2", "updated Localisation"+location.getLatitude()+"-"+location.getLongitude());
+        //Update User Marker Location:
+        if(this.userMarker != null) {
+            this.userMarker.setLatitude(location.getLatitude());
+            this.userMarker.setLongitude(location.getLongitude());
+            this.userMarker.updateMarker(location.getLatitude(), location.getLongitude());
         }
     }
 }

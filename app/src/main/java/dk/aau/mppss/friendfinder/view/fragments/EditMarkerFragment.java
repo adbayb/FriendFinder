@@ -188,7 +188,8 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
                 nameTextView.getText().toString(),
                 descriptionTextView.getText().toString(),
                 latLng.latitude,
-                latLng.longitude
+                latLng.longitude,
+                null
         );
 
         return poiMarkerModel;

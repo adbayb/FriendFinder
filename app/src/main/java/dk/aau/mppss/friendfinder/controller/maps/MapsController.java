@@ -104,20 +104,24 @@ public class MapsController {
 
     }
 
-    public Marker addPOIMarker(POIMarkerModel poiMarkerModel) {
-        Marker marker = this.maps.addMarker(poiMarkerModel, R.drawable.poi);
+    public POIMarkerModel addPOIMarker(POIMarkerModel poiMarkerModel) {
+        POIMarkerModel markerModel = (POIMarkerModel) this.maps.addMarker(poiMarkerModel, R.drawable.poi);
         //Log.e("Avant", poiMarkerModel.toString());
         //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
 
-        return marker;
+        return markerModel;
     }
 
-    public Marker addFBMarker(FBMarkerModel fbMarkerModel) {
-        Marker marker = this.maps.addMarker(fbMarkerModel, R.drawable.user);
+    public FBMarkerModel addFBMarker(FBMarkerModel fbMarkerModel) {
+        FBMarkerModel markerModel = (FBMarkerModel) this.maps.addMarker(fbMarkerModel, R.drawable.user);
         //Log.e("Avant", poiMarkerModel.toString());
         //Log.e("Après", "" + this.maps.findMarkerModelFromMarker(mark).toString());
 
-        return marker;
+        return markerModel;
+    }
+
+    public FBMarkerModel setUserMarker(FBMarkerModel fbMarkerModel) {
+        return this.addFBMarker(fbMarkerModel);
     }
 
     /*
