@@ -50,11 +50,9 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
         GoogleMap googleMap = ((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.fragment_maps_map_view))
                 .getMap();
-        //Controller Initialization:
+        //Controller with View Initialization:
         if(this.mapsController == null) {
             this.mapsController = new MapsController(this.getChildFragmentManager(), inflater, googleMap);
-            //We set a defaut camera position with animation:
-            this.mapsController.moveAnimatedCamera(58.0, 9.0, 4);
         }
         //Log.e("AYOUB", "onCreateView ");
         return parentView;
@@ -63,8 +61,24 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        //onActivityCreated called after onCreateView in Fragment Lifecycle:
         //Log.e("AYOUB", "onActivityCreated ");
-        this.updateMapView();
+        //Controller Initialization:
+        if(this.mapsController != null) {
+            this.mapsController.initializeMaps();
+            //We set a defaut camera position with animation:
+            this.mapsController.moveAnimatedCamera(58.0, 9.0, 4);
+            //Setup location Listener:
+            this.mapsController.getMapsModel()
+                    .getGoogleMap()
+                    .setOnMyLocationChangeListener(new MapsLocationListener(getActivity(), this));
+            //Setup listeners that it will be used during all cycle (if there will be used only in onResume just call them in onResume):
+            this.onUpdateButtonListener();
+            this.mapsController.enableWindowAdapter();
+            this.mapsController.addPOIListener();
+            //Get view marker contents from DB and add it to current map:
+            this.updateMapView();
+        }
     }
 
     @Override
@@ -76,13 +90,6 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
         //onResume isn't limited to being called after the activity has been paused, it's called whenever the activity goes to the
         //top of the activity stack. That includes the first time it's shown after it's been created.
         super.onResume();
-
-        if(this.mapsController != null) {
-            this.onUpdateButtonListener();
-            this.mapsController.enableWindowAdapter();
-            this.mapsController.addPOIListener();
-            //this.mapsController.removePOIListener();
-        }
         //Log.e("AYOUB", "onResume ");
     }
 
@@ -129,11 +136,6 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
 
     public boolean updateMapView() {
         if(this.mapsController != null) {
-            this.mapsController.initializeMaps();
-            //Reset myLocationListener in order to update user position properly on map:
-            this.mapsController.getMapsModel()
-                    .getGoogleMap()
-                    .setOnMyLocationChangeListener(new MapsLocationListener(getActivity(), this));
 
             return this.updateMapFromHttpRequests();
         }
@@ -179,11 +181,15 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
             );
             fbHttpAsyncTask.execute();
 
-            //We set a default position for current user since it will be updated by location listener:
-            this.userMarker = this.mapsController.setUserMarker(
-                    new FBMarkerModel(UtilityClass.getUserName(), null, 58.0, 9.0, null),
-                    R.drawable.user
-            );
+            if(this.userMarker != null) {
+                this.userMarker = this.mapsController.setUserMarker(
+                        new FBMarkerModel(
+                                UtilityClass.getUserName(), null, this.userMarker.getLatitude(), this.userMarker
+                                .getLongitude(), null
+                        ),
+                        R.drawable.user
+                );
+            }
 
             return true;
         }
@@ -233,8 +239,26 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
             coordUserHttpAsyncTask.execute();
 
             //Update User Marker Location:
-            this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
-            return true;
+            if(this.userMarker == null) {
+                //We set a default position for current user since it will be updated by location listener:
+                this.userMarker = this.mapsController.setUserMarker(
+                        new FBMarkerModel(
+                                UtilityClass.getUserName(), null, location.getLatitude(), location.getLongitude(), null
+                        ),
+                        R.drawable.user
+                );
+
+                return true;
+            } else {
+                if(this.mapsController.updateFBMarker(
+                        this.userMarker, location.getLatitude(), location.getLongitude()
+                ) != null) {
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         return false;
@@ -256,8 +280,8 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
     @Override
     public void onGetLocation(Location location) {
         //Set User Marker:
-        //this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
         if(location != null) {
+
             this.updateUserLocation(location);
         }
 

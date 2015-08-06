@@ -59,7 +59,7 @@ public class MapsController {
         this.maps.getGoogleMap().setIndoorEnabled(true);
         this.maps.getGoogleMap().setMapType(GoogleMap.MAP_TYPE_NORMAL);
         this.maps.getGoogleMap().setBuildingsEnabled(true);
-        this.maps.getGoogleMap().setTrafficEnabled(true);
+        this.maps.getGoogleMap().setTrafficEnabled(false);
         this.maps.getGoogleMap().setMyLocationEnabled(true);
         //this.maps.addMarker(new MarkerModel("TOTO",25.6, 27.8));
         //this.maps.setCameraPosition(25.6, 27.8, 6);
@@ -119,18 +119,22 @@ public class MapsController {
                     .findMarkerModelFromPosition(new LatLng(latitude, longitude));
 
             //Remove old MarkerModel from Map List:
-            if(oldPOIMarkerModel != null)
-                this.getMapsModel().getMarkersList().remove(oldPOIMarkerModel);
+            Map<String, MarkerModel> poiMarkersList = this.getMapsModel().getMarkersList();
+            if(poiMarkersList != null) {
+                if(oldPOIMarkerModel != null)
+                    this.getMapsModel().getMarkersList().remove(oldPOIMarkerModel);
 
-            //Update Marker Model + marker position attached to it:
-            poiMarkerModel.setLatitude(latitude);
-            poiMarkerModel.setLongitude(longitude);
-            poiMarkerModel.updateMarker(latitude, longitude);
+                //Update Marker Model + marker position attached to it:
+                poiMarkerModel.setLatitude(latitude);
+                poiMarkerModel.setLongitude(longitude);
+                poiMarkerModel.updateMarker(latitude, longitude);
 
-            //Add the new updated MarkerModel inside Map List:
-            return (POIMarkerModel) this.getMapsModel()
-                    .getMarkersList()
-                    .put(latitude + "-" + longitude, (POIMarkerModel) poiMarkerModel);
+                //Add the new updated MarkerModel inside Map List:
+                return (POIMarkerModel) this.getMapsModel()
+                        .getMarkersList()
+                        .put(latitude + "-" + longitude, (POIMarkerModel) poiMarkerModel);
+            }
+            return null;
         }
         return null;
     }
@@ -149,18 +153,20 @@ public class MapsController {
                     .findMarkerModelFromPosition(new LatLng(latitude, longitude));
 
             //Remove old MarkerModel from Map List:
-            if(oldFBMarkerModel != null)
-                this.getMapsModel().getMarkersList().remove(oldFBMarkerModel);
+            Map<String, MarkerModel> fbMarkersList = this.getMapsModel().getMarkersList();
+            if(fbMarkersList != null) {
+                if(oldFBMarkerModel != null)
+                    fbMarkersList.remove(oldFBMarkerModel);
 
-            //Update Marker Model + marker position attached to it:
-            fbMarkerModel.setLatitude(latitude);
-            fbMarkerModel.setLongitude(longitude);
-            fbMarkerModel.updateMarker(latitude, longitude);
+                //Update Marker Model + marker position attached to it:
+                fbMarkerModel.setLatitude(latitude);
+                fbMarkerModel.setLongitude(longitude);
+                fbMarkerModel.updateMarker(latitude, longitude);
 
-            //Add the new updated MarkerModel inside Map List:
-            return (FBMarkerModel) this.getMapsModel()
-                    .getMarkersList()
-                    .put(latitude + "-" + longitude, (FBMarkerModel) fbMarkerModel);
+                //Add the new updated MarkerModel inside Map List:
+                return (FBMarkerModel) fbMarkersList.put(latitude + "-" + longitude, (FBMarkerModel) fbMarkerModel);
+            }
+            return null;
         }
         return null;
     }

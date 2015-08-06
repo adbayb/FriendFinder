@@ -30,8 +30,8 @@ public class MapsLocationListener implements GoogleMap.OnMyLocationChangeListene
                             ": " + location.getLongitude() + ". ACCURACY: " + location.getAccuracy(), Toast.LENGTH_LONG
             ).show();*/
         } else {
-            //We set precision to 10 meters even if it's an approximate precision:
-            if(lastLocation.distanceTo(location) > 10) {
+            //We set precision to 3 meters even if it's an approximate precision:
+            if(lastLocation.distanceTo(location) > 3) {
                 lastLocation = currLocation;
                 currLocation = location;
                 this.onMapsLocationListener.onUpdatedLocation(location);
