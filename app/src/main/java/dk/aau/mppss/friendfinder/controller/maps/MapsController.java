@@ -1,7 +1,6 @@
 package dk.aau.mppss.friendfinder.controller.maps;
 
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -13,11 +12,12 @@ import java.util.List;
 import java.util.Map;
 
 import dk.aau.mppss.friendfinder.R;
+import dk.aau.mppss.friendfinder.controller.maps.adapter.MapsWindowAdapter;
 import dk.aau.mppss.friendfinder.model.maps.CameraModel;
-import dk.aau.mppss.friendfinder.model.maps.FBMarkerModel;
 import dk.aau.mppss.friendfinder.model.maps.MapsModel;
-import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
-import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
+import dk.aau.mppss.friendfinder.model.maps.marker.FBMarkerModel;
+import dk.aau.mppss.friendfinder.model.maps.marker.MarkerModel;
+import dk.aau.mppss.friendfinder.model.maps.marker.POIMarkerModel;
 import dk.aau.mppss.friendfinder.view.Gui;
 import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
@@ -170,7 +170,9 @@ public class MapsController {
     }
 
     /*
-    //Trop imprécis puisque nous ne récupérons pas la position initiale avant drag & drop:
+    //@ implémenter plus tard (facile car chaque MarkerModel stocke la référence vers le marqueur:
+    //il suffit alors de récupérer la position du marker avant drag & drop et d'updater la position en BDD avec ces positions:
+    //Attention, au préalable il faut setter le marker avec la propriété setDraggable à true (cf. addMapMarker dans MapsModel):
     public void removePOIListener() {
         this.maps.getGoogleMap().setOnMarkerDragListener(
                 new GoogleMap.OnMarkerDragListener() {
@@ -207,8 +209,6 @@ public class MapsController {
                 new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-
-                        Log.e("DEBUGGGGGG44", "" + marker);
                         if(marker != null) {
                             //Log.d("Before: ", maps.getMarkersList().toString());
                             //maps.removeMarkerFromList(marker.getPosition().latitude, marker.getPosition().longitude);

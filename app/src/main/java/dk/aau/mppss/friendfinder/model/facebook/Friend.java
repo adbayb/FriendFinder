@@ -1,7 +1,5 @@
 package dk.aau.mppss.friendfinder.model.facebook;
 
-import android.location.Location;
-
 /**
  * Created by Sekou on 30/07/15.
  */

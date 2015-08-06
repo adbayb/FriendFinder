@@ -1,6 +1,7 @@
-package dk.aau.mppss.friendfinder.controller.maps;
+package dk.aau.mppss.friendfinder.controller.maps.adapter;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,8 +11,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import dk.aau.mppss.friendfinder.R;
-import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
-import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
+import dk.aau.mppss.friendfinder.controller.maps.MapsController;
+import dk.aau.mppss.friendfinder.model.maps.marker.MarkerModel;
+import dk.aau.mppss.friendfinder.model.maps.marker.POIMarkerModel;
 import dk.aau.mppss.friendfinder.view.Gui;
 import dk.aau.mppss.friendfinder.view.fragments.EditMarkerFragment;
 
@@ -90,13 +92,17 @@ public class MapsWindowAdapter implements GoogleMap.InfoWindowAdapter, GoogleMap
         title.setText(markerModel.getLabel());
         if(markerModel instanceof POIMarkerModel) {
             description.setText(((POIMarkerModel) markerModel).getDescription());
+            Drawable iconDrawable = view.getResources().getDrawable(R.drawable.marker_poi);
+            if(iconDrawable != null)
+                icon.setImageDrawable(iconDrawable);
             //Log.e("AYOUB INSTANCE OK", "POI");
         } else {
             description.setText("");
+            Drawable iconDrawable = view.getResources().getDrawable(R.drawable.marker_facebook);
+            if(iconDrawable != null)
+                icon.setImageDrawable(iconDrawable);
             //Log.e("AYOUB INSTANCE OK", "FB");
         }
-        //TODO gestion icon:
-        //icon.setImageDrawable();
     }
 
     public LayoutInflater getInflater() {

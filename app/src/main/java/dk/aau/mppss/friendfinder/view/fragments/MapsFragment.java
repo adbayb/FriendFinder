@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -18,22 +19,25 @@ import java.util.List;
 import dk.aau.mppss.friendfinder.R;
 import dk.aau.mppss.friendfinder.UtilityClass;
 import dk.aau.mppss.friendfinder.controller.HttpAsyncTask;
+import dk.aau.mppss.friendfinder.controller.OnHttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.maps.MapsController;
-import dk.aau.mppss.friendfinder.controller.maps.MapsFBHttpAsyncTask;
-import dk.aau.mppss.friendfinder.controller.maps.MapsLocationListener;
 import dk.aau.mppss.friendfinder.controller.maps.MapsNotificationController;
-import dk.aau.mppss.friendfinder.controller.maps.MapsPOIHttpAsyncTask;
-import dk.aau.mppss.friendfinder.controller.maps.OnMapsLocationListener;
-import dk.aau.mppss.friendfinder.model.maps.FBMarkerModel;
-import dk.aau.mppss.friendfinder.model.maps.MarkerModel;
+import dk.aau.mppss.friendfinder.controller.maps.http.MapsFBHttpAsyncTask;
+import dk.aau.mppss.friendfinder.controller.maps.http.MapsPOIHttpAsyncTask;
+import dk.aau.mppss.friendfinder.controller.maps.location.MapsLocationListener;
+import dk.aau.mppss.friendfinder.controller.maps.location.OnMapsLocationListener;
+import dk.aau.mppss.friendfinder.model.maps.MapsModel;
+import dk.aau.mppss.friendfinder.model.maps.marker.FBMarkerModel;
+import dk.aau.mppss.friendfinder.model.maps.marker.MarkerModel;
 
 /**
  * A fragment that launches other parts of the demo application.
  */
-public class MapsFragment extends Fragment implements OnMapsLocationListener {
+public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLocationListener {
     private MapsController mapsController;
     private List<? extends MarkerModel> sqlMarkers;
     private FBMarkerModel userMarker;
+    private Button updateButton;
 
     @Nullable
     @Override
@@ -42,6 +46,7 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
         //parent view automatically in function of resolution etc...:
         View parentView = inflater.inflate(R.layout.fragment_maps, container, false);
 
+        this.updateButton = (Button) parentView.findViewById(R.id.fragment_maps_update_button);
         GoogleMap googleMap = ((SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.fragment_maps_map_view))
                 .getMap();
@@ -50,10 +55,6 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
             this.mapsController = new MapsController(this.getChildFragmentManager(), inflater, googleMap);
             //We set a defaut camera position with animation:
             this.mapsController.moveAnimatedCamera(58.0, 9.0, 4);
-
-            this.mapsController.getMapsModel()
-                    .getGoogleMap()
-                    .setOnMyLocationChangeListener(new MapsLocationListener(getActivity(), this));
         }
         //Log.e("AYOUB", "onCreateView ");
         return parentView;
@@ -62,43 +63,8 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        if(this.mapsController != null) {
-            this.mapsController.initializeMaps();
-
-            HttpAsyncTask poiUserHttpAsyncTask = new HttpAsyncTask(
-                    new MapsPOIHttpAsyncTask(this.mapsController, R.drawable.user_poi, true),
-                    UtilityClass.urlGetAllUserPOI,
-                    new HashMap<String, Object>() {{
-                        put("idFacebook", UtilityClass.getUserID());
-                    }}
-            );
-            poiUserHttpAsyncTask.execute();
-
-            HttpAsyncTask poiFriendsHttpAsyncTask = new HttpAsyncTask(
-                    new MapsPOIHttpAsyncTask(this.mapsController, R.drawable.friend_poi, false),
-                    UtilityClass.urlGetAllFriendsPOI,
-                    new HashMap<String, Object>() {{
-                        put("idFacebook", UtilityClass.getUserID());
-                    }}
-            );
-            poiFriendsHttpAsyncTask.execute();
-
-            HttpAsyncTask fbHttpAsyncTask = new HttpAsyncTask(
-                    new MapsFBHttpAsyncTask(this.mapsController, R.drawable.friend),
-                    UtilityClass.urlGetFriendsFB,
-                    new HashMap<String, Object>() {{
-                        put("idUser", UtilityClass.getUserID());
-                    }}
-            );
-            fbHttpAsyncTask.execute();
-
-            this.userMarker = this.mapsController.setUserMarker(
-                    new FBMarkerModel(UtilityClass.getUserName(), null, 1.2, 3.4, null),
-                    R.drawable.user
-            );
-            //Log.e("AYOUB", "onActivityCreated ");
-        }
+        //Log.e("AYOUB", "onActivityCreated ");
+        this.updateMapView();
     }
 
     @Override
@@ -112,6 +78,7 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
         super.onResume();
 
         if(this.mapsController != null) {
+            this.onUpdateButtonListener();
             this.mapsController.enableWindowAdapter();
             this.mapsController.addPOIListener();
             //this.mapsController.removePOIListener();
@@ -145,6 +112,85 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
         //Log.e("AYOUB", "onLowMemory ");
     }
 
+    public boolean onUpdateButtonListener() {
+        if(this.updateButton != null) {
+            this.updateButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            updateMapView();
+                        }
+                    }
+            );
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateMapView() {
+        if(this.mapsController != null) {
+            this.mapsController.initializeMaps();
+            //Reset myLocationListener in order to update user position properly on map:
+            this.mapsController.getMapsModel()
+                    .getGoogleMap()
+                    .setOnMyLocationChangeListener(new MapsLocationListener(getActivity(), this));
+
+            return this.updateMapFromHttpRequests();
+        }
+        return false;
+    }
+
+    public boolean updateMapFromHttpRequests() {
+        if(this.mapsController != null) {
+            //Reset Map Model:
+            MapsModel mapsModel = this.mapsController.getMaps();
+            if(mapsModel != null) {
+                GoogleMap googleMap = mapsModel.getGoogleMap();
+                mapsModel.setMarkersList(new HashMap<String, MarkerModel>());
+                if(googleMap != null) {
+                    googleMap.clear();
+                }
+            }
+            //Reinitialize Map:
+            HttpAsyncTask poiUserHttpAsyncTask = new HttpAsyncTask(
+                    new MapsPOIHttpAsyncTask(this.mapsController, R.drawable.user_poi, true),
+                    UtilityClass.urlGetAllUserPOI,
+                    new HashMap<String, Object>() {{
+                        put("idFacebook", UtilityClass.getUserID());
+                    }}
+            );
+            poiUserHttpAsyncTask.execute();
+
+            HttpAsyncTask poiFriendsHttpAsyncTask = new HttpAsyncTask(
+                    new MapsPOIHttpAsyncTask(this.mapsController, R.drawable.friend_poi, false),
+                    UtilityClass.urlGetAllFriendsPOI,
+                    new HashMap<String, Object>() {{
+                        put("idFacebook", UtilityClass.getUserID());
+                    }}
+            );
+            poiFriendsHttpAsyncTask.execute();
+
+            HttpAsyncTask fbHttpAsyncTask = new HttpAsyncTask(
+                    new MapsFBHttpAsyncTask(this.mapsController, R.drawable.friend),
+                    UtilityClass.urlGetFriendsFB,
+                    new HashMap<String, Object>() {{
+                        put("idUser", UtilityClass.getUserID());
+                    }}
+            );
+            fbHttpAsyncTask.execute();
+
+            //We set a default position for current user since it will be updated by location listener:
+            this.userMarker = this.mapsController.setUserMarker(
+                    new FBMarkerModel(UtilityClass.getUserName(), null, 58.0, 9.0, null),
+                    R.drawable.user
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
     public EditMarkerFragment isVisibleEditMarkerFragment() {
         FragmentManager childFragmentManager = this.getChildFragmentManager();
         if(childFragmentManager != null) {
@@ -170,6 +216,30 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
         return false;
     }
 
+    private boolean updateUserLocation(Location location) {
+        if(location != null) {
+            final Location currentLoc = location;
+            //Attention: for HashMap we need to send objects so send a value like that
+            //currentLoc.getLatitude() will not work since it's a litteral value!:
+            HttpAsyncTask coordUserHttpAsyncTask = new HttpAsyncTask(
+                    MapsFragment.this,
+                    UtilityClass.urlUpdateUser,
+                    new HashMap<String, Object>() {{
+                        put("idFacebook", UtilityClass.getUserID());
+                        put("lastKnownLocationLat", new Double(currentLoc.getLatitude()).toString());
+                        put("lastKnownLocationLong", new Double(currentLoc.getLongitude()).toString());
+                    }}
+            );
+            coordUserHttpAsyncTask.execute();
+
+            //Update User Marker Location:
+            this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -184,21 +254,34 @@ public class MapsFragment extends Fragment implements OnMapsLocationListener {
     }
 
     @Override
-    public void getInitialLocation(Location location) {
+    public void onGetLocation(Location location) {
         //Set User Marker:
-        this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
+        //this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
+        if(location != null) {
+            this.updateUserLocation(location);
+        }
+
+        return;
     }
 
     @Override
     public void onUpdatedLocation(Location location) {
-        new MapsNotificationController(this.getActivity()).newNotification(
-                0,
-                R.drawable.user,
-                "FriendFinder Notification: Updated Location",
-                "New Location more than 3 meters from previous one"
-        );
-        //Log.e("Ayoub", "updated Localisation"+location.getLatitude()+"-"+location.getLongitude());
-        //Update User Marker Location:
-        this.mapsController.updateFBMarker(this.userMarker, location.getLatitude(), location.getLongitude());
+        if(location != null) {
+            //User map update + DB update:
+            this.updateUserLocation(location);
+            //Notification builder:
+            new MapsNotificationController(this.getActivity()).newNotification(
+                    0,
+                    R.drawable.user,
+                    "FriendFinder Notification: Updated Location",
+                    "New Location more than 3 meters from previous one"
+            );
+            //Log.e("Ayoub", "updated Localisation"+location.getLatitude()+"-"+location.getLongitude());
+        }
+    }
+
+    @Override
+    public void onHttpAsyncTaskCompleted(String result) {
+        return;
     }
 }

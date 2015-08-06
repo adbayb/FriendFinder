@@ -1,4 +1,4 @@
-package dk.aau.mppss.friendfinder.model.maps;
+package dk.aau.mppss.friendfinder.model.maps.marker;
 
 import com.google.android.gms.maps.model.Marker;
 
@@ -6,7 +6,6 @@ import com.google.android.gms.maps.model.Marker;
  * Created by adibayoub on 04/08/2015.
  */
 public class POIMarkerModel extends MarkerModel {
-    //TODO ajouter une variable indiquant si le marqueur appartient à un ami ou non afin d'éviter l'ouverture de l'éditeur POI!
     private String description;
     //Variable that specifies if a poi belongs to current user or its friends:
     private boolean belongsToUser;

@@ -1,7 +1,5 @@
 <resources>
     <!--
-    TODO: Before you run your application, you need a Google MapsModel API key.
-
     To get one, follow this link, follow the directions and press "Create" at the end:
 
 https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=DA:57:D8:33:8A:B5:08:0E:9B:A6:DB:BA:29:8C:1C:AB:D7:91:64:92%3Bdk.aau.mppss.friendfinder

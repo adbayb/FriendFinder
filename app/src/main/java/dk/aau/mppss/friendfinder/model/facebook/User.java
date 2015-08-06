@@ -1,7 +1,5 @@
 package dk.aau.mppss.friendfinder.model.facebook;
 
-import android.location.Location;
-
 public class User {
     private String id;
     private String name;

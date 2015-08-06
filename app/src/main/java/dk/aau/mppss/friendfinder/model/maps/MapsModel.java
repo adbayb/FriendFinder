@@ -12,6 +12,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.HashMap;
 import java.util.Map;
 
+import dk.aau.mppss.friendfinder.model.maps.marker.MarkerModel;
+
 /**
  * Created by adibayoub on 28/07/2015.
  */
@@ -36,18 +38,17 @@ public class MapsModel {
 
             MarkerOptions markerOptions = new MarkerOptions().position(
                     new LatLng(markerModel.getLatitude(), markerModel.getLongitude())
-            )
-                    .title(markerModel.getLabel())
+            ).title(markerModel.getLabel())
                     .icon(BitmapDescriptorFactory.fromResource(idIconImage));
+            //color marker:
             //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-            //.icon(BitmapDescriptorFactory.fromResource(R.drawable.arrow))
 
             //addMarker returns a Marker from google maps api:
             Marker marker = this.googleMap.addMarker(markerOptions);
             //We add Marker reference inside MarkerModel to be able to remove it easily after:
             markerModel.setMarker(marker);
             //Enable Drag & Drop on marker:
-            marker.setDraggable(true);
+            //marker.setDraggable(true);
 
             return markerModel;
         }

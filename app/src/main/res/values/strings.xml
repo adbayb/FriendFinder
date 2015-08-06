@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">FriendFinder</string>
     <string name="facebook_app_id">1600407430232340</string>
-    <string name="button_search_friend">Search a Friend</string>
-    <string name="button_search_poi">Search a POI</string>
+    <string name="maps_update_button">Manual Map Update</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>

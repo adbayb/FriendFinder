@@ -1,4 +1,4 @@
-package dk.aau.mppss.friendfinder.model.maps;
+package dk.aau.mppss.friendfinder.model.maps.marker;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;

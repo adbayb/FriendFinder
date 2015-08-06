@@ -17,7 +17,7 @@ import dk.aau.mppss.friendfinder.R;
 import dk.aau.mppss.friendfinder.UtilityClass;
 import dk.aau.mppss.friendfinder.controller.HttpAsyncTask;
 import dk.aau.mppss.friendfinder.controller.OnHttpAsyncTask;
-import dk.aau.mppss.friendfinder.model.maps.POIMarkerModel;
+import dk.aau.mppss.friendfinder.model.maps.marker.POIMarkerModel;
 import dk.aau.mppss.friendfinder.view.Gui;
 
 /**
@@ -114,25 +114,6 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            /*
-                            POIMarkerModel poiMarker;
-                            //si null, on est en mode création d'un poi sinon update:
-                            if(poiMarkerModel == null)
-                                poiMarker = createPOIMarker(UtilityClass.urlCreatePOI);
-                            else {
-                                poiMarker = updatePOIMarker(UtilityClass.urlUpdatePOI);
-                            }
-
-                            //We get parent fragment since EditMarkerFragment will be
-                            //added inside a fragment and not like a root fragment. For example inside
-                            //MapsFragment via getChildFragmentManager
-                            MapsFragment parentFragment = (MapsFragment) getParentFragment();
-                            if(parentFragment != null) {
-                                parentFragment.getMapsController().addPOIMarker(poiMarker);
-                                //Nous enlevons l'éditeur et on remet le listener d'ajout POI en place:
-                                hideEditor(parentFragment);
-                            }
-                            */
                             //Log.e("EditMarker AYOUB", "CLICK DELETE");
                             if(deletePOIMarker() != null) {
                                 MapsFragment parentFragment = (MapsFragment) getParentFragment();
@@ -175,7 +156,21 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         }
     }
 
-    public void onHttpDeletePOI() {
+    public void hideEditor(MapsFragment mapsFragment) {
+        //parentFragment.onStop();
+        //We remove editor poi fragment from stack:
+        Gui.popFragment(
+                getParentFragment().getChildFragmentManager()
+        );
+        //We stop button listener:
+        this.saveButton.setOnClickListener(null);
+        this.deleteButton.setOnClickListener(null);
+        mapsFragment.onResume();
+
+        return;
+    }
+
+    private void onHttpDeletePOI() {
         try {
             HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
                     EditMarkerFragment.this,
@@ -195,29 +190,24 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         return;
     }
 
-    public void onHttpCreatePOI() {
-        try {
-            HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
-                    EditMarkerFragment.this,
-                    UtilityClass.urlCreatePOI,
-                    new HashMap<String, Object>() {{
-                        put("userId", UtilityClass.getUserID());
-                        put("title", nameTextView.getText().toString());
-                        put("description", descriptionTextView.getText().toString());
-                        put("latitude", new Double(latLng.latitude).toString());
-                        put("longitude", new Double(latLng.longitude).toString());
-                    }}
-            );
-            httpAsyncTask.execute();
-        }
-        catch(Exception e) {
-            //Log.e("Fail", e.toString());
-        }
+    private void onHttpCreatePOI() {
+        HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
+                EditMarkerFragment.this,
+                UtilityClass.urlCreatePOI,
+                new HashMap<String, Object>() {{
+                    put("userId", UtilityClass.getUserID());
+                    put("title", nameTextView.getText().toString());
+                    put("description", descriptionTextView.getText().toString());
+                    put("latitude", new Double(latLng.latitude).toString());
+                    put("longitude", new Double(latLng.longitude).toString());
+                }}
+        );
+        httpAsyncTask.execute();
 
         return;
     }
 
-    public void onHttpUpdatePOI() {
+    private void onHttpUpdatePOI() {
         try {
             HttpAsyncTask httpAsyncTask = new HttpAsyncTask(
                     EditMarkerFragment.this,
@@ -239,7 +229,7 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         return;
     }
 
-    public POIMarkerModel createPOIMarker() {
+    private POIMarkerModel createPOIMarker() {
         this.onHttpCreatePOI();
 
         poiMarkerModel = new POIMarkerModel(
@@ -254,7 +244,7 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         return poiMarkerModel;
     }
 
-    public POIMarkerModel updatePOIMarker() {
+    private POIMarkerModel updatePOIMarker() {
         if(poiMarkerModel != null) {
             this.onHttpUpdatePOI();
 
@@ -272,7 +262,7 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         return null;
     }
 
-    public POIMarkerModel deletePOIMarker() {
+    private POIMarkerModel deletePOIMarker() {
         if(poiMarkerModel != null) {
             this.onHttpDeletePOI();
 
@@ -283,20 +273,6 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
             return poiMarkerModel;
         }
         return null;
-    }
-
-    public void hideEditor(MapsFragment mapsFragment) {
-        //parentFragment.onStop();
-        //We remove editor poi fragment from stack:
-        Gui.popFragment(
-                getParentFragment().getChildFragmentManager()
-        );
-        //We stop button listener:
-        this.saveButton.setOnClickListener(null);
-        this.deleteButton.setOnClickListener(null);
-        mapsFragment.onResume();
-
-        return;
     }
 
     @Override

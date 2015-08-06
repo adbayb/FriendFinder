@@ -1,4 +1,4 @@
-package dk.aau.mppss.friendfinder.controller.maps;
+package dk.aau.mppss.friendfinder.controller.maps.location;
 
 import android.content.Context;
 import android.location.Location;
@@ -23,8 +23,8 @@ public class MapsLocationListener implements GoogleMap.OnMyLocationChangeListene
     public void onMyLocationChange(Location location) {
         //only register as changed location if user location has changed more than 50 meters
         if(lastLocation == null) {
-            this.onMapsLocationListener.getInitialLocation(location);
             lastLocation = location;
+            this.onMapsLocationListener.onGetLocation(location);
             /*Toast.makeText(
                     context, "INITIAL LOCATION SET TO LAST LOCATION:" + location.getLatitude() +
                             ": " + location.getLongitude() + ". ACCURACY: " + location.getAccuracy(), Toast.LENGTH_LONG
@@ -41,7 +41,6 @@ public class MapsLocationListener implements GoogleMap.OnMyLocationChangeListene
                     .getLongitude(), Toast.LENGTH_LONG
             ).show();*/
             } else {
-                //do nothing - not enough change in location to register!!!
             /*String dist = String.valueOf(lastLocation.distanceTo(location));
             Toast.makeText(
                     context, "DISTANCE" + dist + ". REGISTERED, BUT NOT NEW: " + location.getLatitude() + " - " + location

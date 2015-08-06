@@ -4,6 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,13 +15,17 @@ public final class UtilityClass {
     public static final String urlCreatePOI = "http://friendfinder.alwaysdata.net/FriendFinder/create_poi.php";
     public static final String urlUpdatePOI = "http://friendfinder.alwaysdata.net/FriendFinder/update_poi.php";
     public static final String urlDeletePOI = "http://friendfinder.alwaysdata.net/FriendFinder/delete_poi.php";
+    public static final String urlCreateUser = "http://friendfinder.alwaysdata.net/FriendFinder/save_user_data.php";
+    public static final String urlUpdateUser = "http://friendfinder.alwaysdata.net/FriendFinder/update_user.php";
     public static final String urlGetAllUserPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_my_poi.php";
+    public static final String urlGetAllUserFriendsPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_poi.php";
     public static final String urlGetFriendsFB = "http://friendfinder.alwaysdata.net/FriendFinder/list_users.php";
     public static final String urlGetAllFriendsPOI = "http://friendfinder.alwaysdata.net/FriendFinder/get_all_friends_poi.php";
 
     //Utility Constants:
     private static String userID;
     private static String userName;
+    private static List<String> friendsList;
 
     private UtilityClass() {
 
@@ -56,6 +62,21 @@ public final class UtilityClass {
         return listValues;
     }
 
+    public static String listStringTOLine(List<String> listString) {
+        String line = "";
+
+        if(listString != null) {
+            Iterator<String> iterator = listString.iterator();
+            while(iterator.hasNext()) {
+                line += "'" + iterator.next() + "'";
+                if(iterator.hasNext())
+                    line += ",";
+            }
+            return line;
+        }
+        return null;
+    }
+
     public static String getUserID() {
         return userID;
     }
@@ -70,5 +91,13 @@ public final class UtilityClass {
 
     public static void setUserName(String userName) {
         UtilityClass.userName = userName;
+    }
+
+    public static List<String> getFriendsList() {
+        return friendsList;
+    }
+
+    public static void setFriendsList(List<String> friendsList) {
+        UtilityClass.friendsList = friendsList;
     }
 }

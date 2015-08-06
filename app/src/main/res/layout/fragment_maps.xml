@@ -15,17 +15,7 @@
 
         <!--
         tools:context allows to attach a layout component to an activity (a layout must be always attached to one activity).
-        A fragment is diffucult to manager on a Fragment class with google maps Api, we used instead a map view.
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            tools:context=".MapsActivity" />
         -->
-
         <fragment
             android:id="@+id/fragment_maps_map_view"
             android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -34,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
 
-        <!-- fragment_container which will be replaced by a fragment xml in substitution (for example POI editor here-->
+        <!-- fragment_container which will be replaced by a fragment xml in substitution (for example POI editor here)-->
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
@@ -48,18 +38,11 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/fragment_maps_button_friend"
+                android:id="@+id/fragment_maps_update_button"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="@string/button_search_friend"/>
-
-            <Button
-                android:id="@+id/fragment_maps_button_poi"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="@string/button_search_poi"/>
+                android:text="@string/maps_update_button"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -1,6 +1,7 @@
 package dk.aau.mppss.friendfinder.controller.facebook;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
@@ -59,6 +60,13 @@ public class FacebookController {
                                     e.printStackTrace();
                                 }
                             }
+
+                            //We must switch activities only after completed FB Request:
+                            Intent switchMapActivity = new Intent(context, MapsActivity.class);
+                            switchMapActivity.putStringArrayListExtra("friendsFBId", (ArrayList<String>) friendsIDList);
+                            //Log.e("Avant MainActivity", "" + (ArrayList<String>) friendsIDList);
+                            context.startActivity(switchMapActivity);
+
                             return;
                         }
                     }
@@ -86,19 +94,12 @@ public class FacebookController {
                             );
 
                             if(user != null) {
-                                /*
                                 //We save user Id inside shared Preferences file:
                                 SharedPreferences userSettings = context.getSharedPreferences(".userSettingsFile", context.MODE_PRIVATE);
                                 SharedPreferences.Editor sharedPrefEditor = userSettings.edit();
                                 sharedPrefEditor.putString("userId", user.getId());
                                 sharedPrefEditor.putString("userName", user.getName());
                                 sharedPrefEditor.commit();
-                                */
-                                //We must switch activities only after completed FB Request:
-                                Intent switchMapActivity = new Intent(context, MapsActivity.class);
-                                switchMapActivity.putExtra("userId", user.getId());
-                                switchMapActivity.putExtra("userName", user.getName());
-                                context.startActivity(switchMapActivity);
                             }
                             //Log.e("Ayoub0", "Pass1" + user.toString());
                         }
