@@ -27,7 +27,7 @@ public class MapsPOIHttpAsyncTask implements OnHttpAsyncTask {
 
     @Override
     public void onHttpAsyncTaskCompleted(String result) {
-        //Log.e("AYOUB", "onPostExecute");
+        //Log.e("AYOUB", "onPostExecute" + result);
         try {
             JSONObject jsonObject = new JSONObject(result);
             if(jsonObject != null) {

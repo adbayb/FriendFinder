@@ -39,6 +39,11 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
     private FBMarkerModel userMarker;
     private Button updateButton;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,7 +66,9 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //onActivityCreated called after onCreateView in Fragment Lifecycle:
+        //onActivityCreated called after onCreateView in Fragment Lifecycle, so manipulated
+        //mapsController here and not on onCreate since we need to instanciate it in onCreateView
+        //(to get inflater and googleMap fragment) and onCreateView is executed after onCreate:
         //Log.e("AYOUB", "onActivityCreated ");
         //Controller Initialization:
         if(this.mapsController != null) {
@@ -72,7 +79,8 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
             this.mapsController.getMapsModel()
                     .getGoogleMap()
                     .setOnMyLocationChangeListener(new MapsLocationListener(getActivity(), this));
-            //Setup listeners that it will be used during all cycle (if there will be used only in onResume just call them in onResume):
+            //Setup listeners that it will be used during all cycle. We need only to setup it one time
+            //(so bad practice to setup them on onResume since JVM needs only to store them one time):
             this.onUpdateButtonListener();
             this.mapsController.enableWindowAdapter();
             this.mapsController.addPOIListener();
@@ -96,9 +104,21 @@ public class MapsFragment extends Fragment implements OnHttpAsyncTask, OnMapsLoc
     @Override
     public void onPause() {
         super.onPause();
-        this.mapsController.stopAddPOIListener();
-        this.mapsController.disableWindowAdapter();
+        if(this.mapsController != null) {
+            this.mapsController.stopAddPOIListener();
+            this.mapsController.disableWindowAdapter();
+        }
         //Log.e("AYOUB", "onPause ");
+    }
+
+    public void onExitPause() {
+        //We restore google maps listener with onExitPause:
+        //Called by child fragment when hidding. Like that we restore listener only one time
+        //(during fragment hiding event) => better than always call them inside onResume:
+        if(this.mapsController != null) {
+            this.mapsController.addPOIListener();
+            this.mapsController.enableWindowAdapter();
+        }
     }
 
     @Override

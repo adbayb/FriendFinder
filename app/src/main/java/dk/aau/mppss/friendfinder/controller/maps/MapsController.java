@@ -42,11 +42,16 @@ public class MapsController {
     }
 
     public void enableWindowAdapter() {
-        this.maps.getGoogleMap().setOnInfoWindowClickListener(mapsWindowAdapter);
+        if(this.mapsWindowAdapter != null)
+            this.maps.getGoogleMap().setOnInfoWindowClickListener(mapsWindowAdapter);
+
+        return;
     }
 
     public void disableWindowAdapter() {
         this.maps.getGoogleMap().setOnInfoWindowClickListener(null);
+
+        return;
     }
 
     public void initializeMaps() {
@@ -63,6 +68,8 @@ public class MapsController {
         this.maps.getGoogleMap().setMyLocationEnabled(true);
         //this.maps.addMarker(new MarkerModel("TOTO",25.6, 27.8));
         //this.maps.setCameraPosition(25.6, 27.8, 6);
+
+        return;
     }
 
     public void addPOIListener() {

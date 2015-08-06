@@ -165,6 +165,8 @@ public class EditMarkerFragment extends Fragment implements OnHttpAsyncTask {
         //We stop button listener:
         this.saveButton.setOnClickListener(null);
         this.deleteButton.setOnClickListener(null);
+        //we restore google maps listener with onExitPause:
+        mapsFragment.onExitPause();
         mapsFragment.onResume();
 
         return;

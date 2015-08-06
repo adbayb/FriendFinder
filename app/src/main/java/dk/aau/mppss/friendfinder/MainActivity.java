@@ -29,14 +29,10 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
         this.callbackManager = CallbackManager.Factory.create();
         setContentView(R.layout.activity_main);
-        /*
-        //add a custom fragment:
-        Gui.attachFragment(
-                getSupportFragmentManager(),
-                R.id.fragment_fb_container,
-                new FacebookLoginFragment()
-        );
-        */
+
+        //Fix Exception "Performing stop of activity that is not resumed" by placing
+        //initializeFacebook inside onCreate instead running it each time on onResume (we only need to register callback one time):
+        this.initializeFacebook();
     }
 
     public void initializeFacebook() {
@@ -101,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         //Log.d("Ayoub MainActivity", "onResume");
         super.onResume();
-        this.initializeFacebook();
     }
 
     @Override
